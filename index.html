@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#f0f4f8">
+  <title>LYYY·yy 工作台</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Mobile Header -->
+    <header class="mobile-header" id="mobileHeader">
+      <button class="menu-btn" id="menuToggle" aria-label="菜单">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <h1 class="app-title">LYYY·yy</h1>
+      <div class="sync-indicator" id="syncIndicator" title="同步状态">
+        <span class="sync-dot"></span>
+        <span class="sync-text">本地</span>
+      </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">LYYY·yy</h2>
+        <p class="sidebar-subtitle">个人工作台</p>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item active" data-page="todo">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+          <span>每日todo</span>
+        </li>
+        <li class="nav-item" data-page="health">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span>健康管理</span>
+        </li>
+        <li class="nav-item" data-page="english">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+          <span>英语学习</span>
+        </li>
+        <li class="nav-item" data-page="tax">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>税务师</span>
+        </li>
+        <li class="nav-item" data-page="finance">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M6 16h.01M10 16h4"/></svg>
+          <span>财务记账</span>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="sync-status-full" id="syncStatusFull">
+          <span class="sync-dot"></span>
+          <span>本地存储模式</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <div class="page-container" id="pageContainer">
+        <!-- Pages rendered here by JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Timer FAB (for time visualization) -->
+  <button class="timer-fab" id="timerFab" style="display:none;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  </button>
+
+  <!-- Timer Modal -->
+  <div class="modal-overlay" id="timerModal" style="display:none;">
+    <div class="modal timer-modal">
+      <div class="timer-display">
+        <div class="timer-circle" id="timerCircle">
+          <span class="timer-time" id="timerTime">25:00</span>
+          <span class="timer-label" id="timerLabel">工作时间</span>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <button class="btn btn-secondary" id="timerStop">终止</button>
+        <button class="btn btn-primary btn-lg" id="timerToggle">开始</button>
+        <button class="btn btn-secondary" id="timerClose">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Add/Edit Modal -->
+  <div class="modal-overlay" id="genericModal" style="display:none;">
+    <div class="modal" id="genericModalContent">
+      <!-- Dynamic content -->
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
