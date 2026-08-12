@@ -342,40 +342,20 @@ function getDefaultCategories() {
   ];
 }
 
-// ========== 模块3b: 视频跟练（教程库 + 内置计时器 + 打卡解锁奖励 + 全平台视频） ==========
+// ========== 模块3b: 视频跟练（记录链接 + 全平台视频 + 在源站打开） ==========
 function renderVideoFollow(el, container) {
   const videos = Store.get('exerciseVideos', []);
-  const today = Store.today();
-  const allDone = videos.flatMap(v => v.doneDates || []);
-  const totalDone = allDone.length;
-  const uniqueDays = new Set(allDone).size;
-  const now = new Date();
-  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthUniqueDays = new Set(allDone.filter(d => d.startsWith(monthStr))).size;
-  const doneCats = new Set(videos.filter(v => (v.doneDates||[]).length > 0).map(v => v.category));
-  const catCount = new Set(videos.map(v => v.category)).size;
-
-  const rewards = [
-    { emoji: '🌟', name: '初次跟练', desc: '完成第一次跟练', unlocked: totalDone >= 1 },
-    { emoji: '🔥', name: '七日之约', desc: '累计跟练满 7 天', unlocked: uniqueDays >= 7 },
-    { emoji: '💎', name: '自律达人', desc: '累计完成 30 次', unlocked: totalDone >= 30 },
-    { emoji: '🏆', name: '全能选手', desc: '每个分类都跟练过', unlocked: catCount > 0 && doneCats.size >= catCount },
-    { emoji: '🎯', name: '月度全勤', desc: '本月打卡 ≥ 20 天', unlocked: monthUniqueDays >= 20 },
-    { emoji: '🌈', name: '百日筑基', desc: '累计跟练满 100 次', unlocked: totalDone >= 100 }
-  ];
-
   el.innerHTML = `
     <div class="card">
       <div class="flex-between mb-8">
-        <div class="card-title" style="margin-bottom:0">🎬 视频跟练教程库</div>
-        <button class="btn btn-primary btn-sm" id="addTutorialBtn">+ 添加教程</button>
+        <div class="card-title" style="margin-bottom:0">🎬 运动视频 · 记录链接</div>
+        <button class="btn btn-primary btn-sm" id="addTutorialBtn">+ 添加链接</button>
       </div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">收纳你的运动教程，支持 B站/YouTube/腾讯/优酷等全平台视频链接。点「跟练」内置计时器，完成后打卡解锁奖励。</div>
-      ${videos.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🏋️</div><div class="empty-state-text">还没有教程，点击右上角添加</div></div>' : ''}
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">收录你的运动教程链接（B站/YouTube/腾讯/优酷等全平台）。点「在源站打开」直接去平台跟练，无需在此打卡。</div>
+      ${videos.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🏋️</div><div class="empty-state-text">还没有链接，点击右上角添加</div></div>' : ''}
       <div style="display:flex;flex-direction:column;gap:14px">
-        ${videos.map(v => {
-          const doneToday = (v.doneDates || []).includes(today);
-          return `<div class="follow-item" data-id="${v.id}">
+        ${videos.map(v => `
+          <div class="follow-item" data-id="${v.id}">
             <div class="flex-between mb-8">
               <div style="font-size:14px;font-weight:600">${escapeHtml(v.title)} <span style="font-size:11px;color:var(--text-muted);font-weight:400">· ${escapeHtml(v.category)}</span></div>
               <button class="action-btn follow-del" data-id="${v.id}" style="opacity:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
@@ -383,76 +363,25 @@ function renderVideoFollow(el, container) {
             ${v.duration ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">⏱ 建议时长 ${v.duration} 分钟</div>` : ''}
             ${renderVideoPlayer(v.url, v.title)}
             ${v.note ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px">${escapeHtml(v.note)}</div>` : ''}
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn btn-primary btn-sm follow-start" data-id="${v.id}" style="flex:1">▶ 跟练计时</button>
-              <button class="btn ${doneToday?'btn-success':'btn-secondary'} btn-sm follow-done" data-id="${v.id}" style="flex:1" ${doneToday?'disabled':''}>${doneToday?'✓ 今日已打卡':'完成打卡'}</button>
+            <div style="margin-top:10px">
+              <button class="btn btn-primary btn-sm follow-open" data-id="${v.id}" style="width:100%">↗ 在源站打开跟练</button>
             </div>
-          </div>`;
-        }).join('')}
+          </div>`).join('')}
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">🏅 奖励解锁</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-        ${rewards.map(r => `<div class="reward-badge ${r.unlocked?'unlocked':''}"><div class="reward-emoji">${r.unlocked ? r.emoji : '🔒'}</div><div class="reward-name">${r.name}</div><div class="reward-desc">${r.desc}</div></div>`).join('')}
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px">累计完成 ${totalDone} 次 · 累计 ${uniqueDays} 天 · 本月 ${monthUniqueDays} 天</div>
     </div>
   `;
 
   document.getElementById('addTutorialBtn').addEventListener('click', () => showTutorialModal(container));
   el.querySelectorAll('.follow-del').forEach(btn => { btn.addEventListener('click', () => { let arr = Store.get('exerciseVideos', []); arr = arr.filter(x => x.id !== btn.dataset.id); Store.set('exerciseVideos', arr); renderVideoFollow(el, container); }); });
-  el.querySelectorAll('.follow-start').forEach(btn => { btn.addEventListener('click', () => { const v = Store.get('exerciseVideos', []).find(x => x.id === btn.dataset.id); if (v) openFollowTimer(v, container); }); });
-  el.querySelectorAll('.follow-done').forEach(btn => { btn.addEventListener('click', () => { markTutorialDone(btn.dataset.id, container); }); });
+  el.querySelectorAll('.follow-open').forEach(btn => { btn.addEventListener('click', () => { const v = Store.get('exerciseVideos', []).find(x => x.id === btn.dataset.id); if (v && v.url) window.open(v.url, '_blank', 'noopener'); else showToast('该教程还没有链接'); }); });
   bindVideoPlayers(el);
-}
-
-function markTutorialDone(id, container) {
-  const videos = Store.get('exerciseVideos', []);
-  const v = videos.find(x => x.id === id); if (!v) return;
-  v.doneDates = v.doneDates || [];
-  if (v.doneDates.includes(Store.today())) return;
-  v.doneDates.push(Store.today());
-  Store.set('exerciseVideos', videos);
-  showToast('打卡成功！继续加油 💪');
-  renderVideoFollow(document.getElementById('exerciseContent'), container);
-}
-
-function openFollowTimer(tutorial, container) {
-  const modal = document.getElementById('genericModal'); const content = document.getElementById('genericModalContent');
-  const secs = (tutorial.duration && tutorial.duration > 0 ? tutorial.duration : 15) * 60;
-  content.innerHTML = `
-    <div class="modal-title">▶ 跟练计时 · ${escapeHtml(tutorial.title)}</div>
-    <div class="timer-display"><div class="timer-circle" id="followCircle">
-      <span class="timer-time" id="followTime">${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}</span>
-      <span class="timer-label" id="followLabel">跟练中</span>
-    </div></div>
-    <div class="timer-controls">
-      <button class="btn btn-secondary" id="followStop">终止</button>
-      <button class="btn btn-primary btn-lg" id="followToggle">开始</button>
-    </div>
-  `;
-  modal.style.display = 'flex';
-  let remaining = secs, running = false, interval = null;
-  const circle = document.getElementById('followCircle');
-  const timeEl = document.getElementById('followTime');
-  const toggleBtn = document.getElementById('followToggle');
-  const label = document.getElementById('followLabel');
-  function update() { const m = Math.floor(remaining/60), s = remaining%60; timeEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
-  function finish() { clearInterval(interval); running = false; label.textContent = '完成！'; toggleBtn.textContent = '开始'; circle.classList.add('rest'); showToast('跟练完成，已打卡 🎉'); markTutorialDone(tutorial.id, container); modal.style.display = 'none'; }
-  toggleBtn.addEventListener('click', () => {
-    if (running) { clearInterval(interval); running = false; toggleBtn.textContent = '继续'; label.textContent = '已暂停'; }
-    else { running = true; toggleBtn.textContent = '暂停'; label.textContent = '跟练中'; interval = setInterval(() => { remaining--; update(); if (remaining <= 0) finish(); }, 1000); }
-  });
-  document.getElementById('followStop').addEventListener('click', () => { clearInterval(interval); modal.style.display = 'none'; });
-  modal.addEventListener('click', (e) => { if (e.target === modal) { clearInterval(interval); modal.style.display = 'none'; } });
 }
 
 function showTutorialModal(container) {
   const modal = document.getElementById('genericModal'); const content = document.getElementById('genericModalContent');
   const categories = Store.get('exerciseVideos', []).reduce((s, v) => { if (!s.includes(v.category)) s.push(v.category); return s; }, ['有氧','力量','拉伸']);
   content.innerHTML = `
-    <div class="modal-title">添加跟练教程</div>
+    <div class="modal-title">添加运动视频链接</div>
     <div class="form-group"><label class="form-label">教程名称</label><input class="form-input" id="tutTitle" placeholder="如：帕梅拉 10分钟全身燃脂"></div>
     <div class="form-group"><label class="form-label">分类</label><input class="form-input" id="tutCat" list="tutCatList" placeholder="如：有氧" value="有氧"><datalist id="tutCatList">${categories.map(c => `<option value="${escapeHtml(c)}">`).join('')}</datalist></div>
     <div class="form-group"><label class="form-label">视频链接（全平台）</label><input class="form-input" id="tutUrl" placeholder="https://..."></div>
@@ -468,7 +397,7 @@ function showTutorialModal(container) {
     const title = document.getElementById('tutTitle').value.trim(); const url = document.getElementById('tutUrl').value.trim();
     if (!title) return;
     const videos = Store.get('exerciseVideos', []);
-    videos.unshift({ id: Store.uid(), title, category: document.getElementById('tutCat').value.trim() || '有氧', url, duration: parseInt(document.getElementById('tutDur').value) || 0, note: document.getElementById('tutNote').value.trim(), doneDates: [], timestamp: Date.now() });
+    videos.unshift({ id: Store.uid(), title, category: document.getElementById('tutCat').value.trim() || '有氧', url, duration: parseInt(document.getElementById('tutDur').value) || 0, note: document.getElementById('tutNote').value.trim(), timestamp: Date.now() });
     Store.set('exerciseVideos', videos); modal.style.display = 'none'; renderVideoFollow(document.getElementById('exerciseContent'), container);
   });
 }
@@ -676,107 +605,114 @@ function renderPlan(area, days, p, container) {
 }
 
 // ========== 模块6: 养出好气血（测评 + 推荐 + 记录） ==========
-const QI_QUESTIONS = [
-  { id: 'cold', q: '是否经常手脚冰凉 / 怕冷？', opts: ['否', '偶尔', '经常'] },
-  { id: 'tired', q: '是否容易疲劳、乏力、没精神？', opts: ['否', '偶尔', '经常'] },
-  { id: 'sleep', q: '睡眠质量如何？', opts: ['好', '一般', '失眠/差'] },
-  { id: 'period', q: '（女性）是否月经量少 / 痛经？', opts: ['否/不适用', '偶尔', '经常'] },
-  { id: 'face', q: '面色是否萎黄、唇色偏淡？', opts: ['否', '偶尔', '经常'] },
-  { id: 'hair', q: '是否脱发、掉发明显？', opts: ['否', '偶尔', '经常'] },
-  { id: 'mood', q: '是否容易生气、焦虑、郁结？', opts: ['否', '偶尔', '经常'] },
-  { id: 'appetite', q: '是否食欲不振、消化不良？', opts: ['否', '偶尔', '经常'] }
-];
+const QI_KB = {
+  '养胃': { teas:['山药小米粥','红枣生姜茶','陈皮普洱茶','茯苓白术茶'], foods:['南瓜','山药','小米','莲子','木瓜'], exercises:['饭后散步15分钟','顺时针揉腹36圈','八段锦·调理脾胃须单举'], acupoints:['中脘穴（健胃）','足三里（健脾）','天枢穴（调肠）'], foot:'艾叶生姜水泡脚，温胃散寒，15-20分钟' },
+  '养肝': { teas:['菊花枸杞茶','玫瑰陈皮茶','决明子茶','柴胡疏肝茶'], foods:['菠菜','芹菜','枸杞','胡萝卜','西兰花'], exercises:['八段锦·摇头摆尾去心火','侧腰拉伸','拉伸肝胆经'], acupoints:['太冲穴（疏肝）','期门穴','肝俞穴'], foot:'花椒水泡脚，疏肝理气' },
+  '养气血': { teas:['红枣枸杞茶','桂圆红枣茶','黄芪当归茶','西洋参茶'], foods:['红枣','桂圆','猪肝','瘦肉','黑芝麻','当归炖鸡'], exercises:['八段锦·双手托天理三焦','温和瑜伽','气血操'], acupoints:['足三里（健脾生血）','三阴交（调血）','血海穴（养血）','关元穴（培元）'], foot:'生姜艾叶水泡脚，温补气血，微微出汗' },
+  '养目': { teas:['枸杞菊花茶','决明子茶','桑叶菊花茶'], foods:['胡萝卜','蓝莓','枸杞','猪肝','菠菜'], exercises:['眼保健操','远眺5分钟','转眼球操','热敷眼周'], acupoints:['睛明穴','攒竹穴','太阳穴','风池穴'], foot:'温水泡脚，引血下行缓解眼疲劳' },
+  '养肾': { teas:['黑豆核桃茶','杜仲茶','五味子茶'], foods:['黑豆','黑芝麻','核桃','海参','枸杞'], exercises:['踮脚提踵','搓腰（肾俞）','八段锦·双手攀足固肾腰'], acupoints:['涌泉穴（补肾）','太溪穴','肾俞穴'], foot:'盐水泡脚，温肾助阳' },
+  '安神': { teas:['酸枣仁百合茶','桂圆莲子茶','薰衣草茶'], foods:['莲子','百合','牛奶','核桃','小米'], exercises:['睡前冥想10分钟','腹式呼吸','静坐调息'], acupoints:['神门穴（安神）','三阴交','涌泉穴'], foot:'薰衣草或花椒水泡脚，安神助眠' }
+};
+
+function getDefaultQiDirections() { return ['养胃', '养肝', '养气血', '养目', '养肾', '安神']; }
 
 function renderQi(el, container) {
-  const logs = Store.get('qiLogs', []);
-  const todayLog = logs.find(l => l.date === Store.today());
+  const directions = Store.get('qiDirections', getDefaultQiDirections());
+  const selected = Store.get('qiSelected', directions.slice());
+  const plans = Store.get('qiPlans', []);
   el.innerHTML = `
     <div class="card">
-      <div class="card-title">🌿 气血状态测评</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">回答以下问题，从中医角度评估你的气血状态并给出调养建议（仅供参考，不替代医疗诊断）。</div>
-      <div id="qiQuestions">
-        ${QI_QUESTIONS.map(qu => `<div class="qi-question"><div class="qi-q-text">${escapeHtml(qu.q)}</div><div class="qi-opts">${qu.opts.map((o, i) => `<button class="qi-opt" data-qid="${qu.id}" data-val="${i}">${o}</button>`).join('')}</div></div>`).join('')}
+      <div class="card-title">🌿 养生方向</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">点选你想调养的方向（可自由增减），下方一键随机生成对应的具体茶饮 / 食饮 / 健身操 / 穴位按摩 / 泡脚建议。</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px" id="qiDirWrap">
+        ${directions.map(d => `<span class="qi-dir-chip ${selected.includes(d)?'active':''}" data-dir="${escapeHtml(d)}"><span class="qi-dir-text">${escapeHtml(d)}</span>${selected.includes(d)?'<span class="qi-dir-check">✓</span>':''}<button class="qi-dir-del" data-dir="${escapeHtml(d)}" title="删除该方向">×</button></span>`).join('')}
       </div>
-      <button class="btn btn-primary btn-lg" id="qiAssessBtn" style="width:100%;margin-top:8px">测评我的状态</button>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-secondary btn-sm" id="qiAddDir" style="flex:1">+ 添加方向</button>
+        <button class="btn btn-primary btn-sm" id="qiGen" style="flex:1">🎲 生成今日养生方案</button>
+      </div>
     </div>
-    <div id="qiResult"></div>
+    <div id="qiPlanResult"></div>
     <div class="card">
-      <div class="card-title">📝 今日记录（睡眠 / 食饮）</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">纯静态页面无法直接读取手机健康APP数据，可在此手动记录；如需自动同步，需配合浏览器扩展或后端服务。</div>
-      <div class="form-group"><label class="form-label">睡眠状态</label><select class="form-input" id="qiSleep"><option ${todayLog?.sleep==='好'?'selected':''}>好</option><option ${todayLog?.sleep==='一般'?'selected':''}>一般</option><option ${todayLog?.sleep==='差'?'selected':''}>差</option><option ${todayLog?.sleep==='失眠'?'selected':''}>失眠</option></select></div>
-      <div class="form-group"><label class="form-label">今日饮茶 / 食饮</label><input class="form-input" id="qiDiet" value="${todayLog?.diet||''}" placeholder="如：喝了红枣枸杞茶、吃了牛羊肉"></div>
-      <div class="form-group"><label class="form-label">今日是否泡脚</label><select class="form-input" id="qiFoot"><option value="否" ${todayLog?.foot==='否'||!todayLog?'selected':''}>否</option><option value="是" ${todayLog?.foot==='是'?'selected':''}>是</option></select></div>
-      <button class="btn btn-success btn-sm" id="qiSaveLog" style="width:100%">保存今日记录</button>
-    </div>
-    <div class="card">
-      <div class="card-title">📅 近期记录</div>
-      ${logs.length === 0 ? '<div class="empty-state"><div class="empty-state-text">暂无记录</div></div>' : logs.slice(0, 10).map(l => `<div class="date-fold"><div class="date-fold-header" onclick="this.parentElement.classList.toggle('open')"><svg class="date-fold-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${formatDateCN(l.date)}<span class="date-fold-count">${l.foot==='是'?'泡脚✓':''}</span></div><div class="date-fold-body"><div style="font-size:13px;color:var(--text-secondary);padding:8px 0">😴 睡眠：${l.sleep||'-'}<br>🍵 食饮：${escapeHtml(l.diet||'-')}</div></div></div>`).join('')}
+      <div class="card-title">📅 近期养生方案</div>
+      ${plans.length === 0 ? '<div class="empty-state"><div class="empty-state-text">还没有生成方案</div></div>' : plans.slice(0, 8).map(p => `<div class="date-fold"><div class="date-fold-header" onclick="this.parentElement.classList.toggle('open')"><svg class="date-fold-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${formatDateCN(p.date)}<span class="date-fold-count">${p.dirs.join('/')}</span></div><div class="date-fold-body">${qiPlanHtml(p)}</div></div>`).join('')}
     </div>
   `;
-  const answers = {};
-  el.querySelectorAll('.qi-opt').forEach(btn => btn.addEventListener('click', () => {
-    const qid = btn.dataset.qid; answers[qid] = parseInt(btn.dataset.val);
-    el.querySelectorAll(`.qi-opt[data-qid="${qid}"]`).forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  el.querySelectorAll('.qi-dir-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      if (e.target.closest('.qi-dir-del')) return;
+      const d = chip.dataset.dir; const sel = Store.get('qiSelected', directions.slice());
+      const i = sel.indexOf(d); if (i >= 0) sel.splice(i, 1); else sel.push(d);
+      Store.set('qiSelected', sel); renderQi(el, container);
+    });
+  });
+  el.querySelectorAll('.qi-dir-del').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const d = btn.dataset.dir; let dirs = Store.get('qiDirections', getDefaultQiDirections()); dirs = dirs.filter(x => x !== d); Store.set('qiDirections', dirs); let sel = Store.get('qiSelected', dirs.slice()); sel = sel.filter(x => x !== d); Store.set('qiSelected', sel); renderQi(el, container); }); });
+  document.getElementById('qiAddDir').addEventListener('click', () => showTextInputModal('添加养生方向', (name) => { if (!name) return; const dirs = Store.get('qiDirections', getDefaultQiDirections()); if (!dirs.includes(name)) { dirs.push(name); Store.set('qiDirections', dirs); const sel = Store.get('qiSelected', dirs.slice()); sel.push(name); Store.set('qiSelected', sel); } renderQi(el, container); }));
+  document.getElementById('qiGen').addEventListener('click', () => {
+    const plan = generateQiPlan(); if (!plan) return;
+    const plans = Store.get('qiPlans', []);
+    const idx = plans.findIndex(p => p.date === plan.date);
+    if (idx >= 0) plans[idx] = plan; else plans.unshift(plan);
+    Store.set('qiPlans', plans);
+    const area = document.getElementById('qiPlanResult');
+    area.innerHTML = `<div class="card qi-result-card"><div class="card-title">🌿 今日养生方案（${plan.dirs.join(' / ')}）</div>${qiPlanHtml(plan)}<div style="font-size:11px;color:var(--text-muted);margin-top:8px">已保存到「近期养生方案」，仅供参考，不替代医疗诊断。</div></div>`;
+    area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
+
+function generateQiPlan() {
+  const directions = Store.get('qiDirections', getDefaultQiDirections());
+  const selected = Store.get('qiSelected', directions.slice()).filter(d => directions.includes(d));
+  if (selected.length === 0) { showToast('请至少选择一个养生方向'); return null; }
+  const pick = (arr, n) => { const c = [...arr]; const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(Math.random() * c.length), 1)[0]); return out; };
+  const teas = new Set(), foods = new Set(), exercises = new Set(), acupoints = new Set(); let foot = '';
+  const unknown = [];
+  selected.forEach(d => {
+    const kb = QI_KB[d];
+    if (!kb) { unknown.push(d); return; }
+    pick(kb.teas, 2).forEach(x => teas.add(x));
+    pick(kb.foods, 3).forEach(x => foods.add(x));
+    pick(kb.exercises, 2).forEach(x => exercises.add(x));
+    pick(kb.acupoints, 2).forEach(x => acupoints.add(x));
+    if (!foot) foot = kb.foot;
+  });
+  return {
+    date: Store.today(), dirs: selected,
+    teas: [...teas], foods: [...foods], exercises: [...exercises], acupoints: [...acupoints],
+    foot: foot || '温水泡脚 15-20 分钟', unknown
+  };
+}
+
+function qiPlanHtml(p) {
+  return `
+    <div class="qi-rec-block"><div class="qi-rec-head">🍵 推荐茶饮</div>${p.teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+    <div class="qi-rec-block"><div class="qi-rec-head">🥗 推荐食饮</div>${p.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+    <div class="qi-rec-block"><div class="qi-rec-head">🤸 推荐健身操</div>${p.exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+    <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位按摩</div>${p.acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+    <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚建议</div><div class="qi-rec-item">${p.foot}</div></div>
+    ${p.unknown && p.unknown.length ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px">自定义方向（${p.unknown.join('、')}）暂无内置资料，建议自行查阅。</div>` : ''}
+  `;
+}
+
+// ========== 模块7: 各种记录（仅"有/无"布尔 + 日期下显示项目 emoji） ==========
+function normalizeHealthRecords(cats) {
+  return (cats || []).map(c => ({
+    name: c.name,
+    icon: c.icon || '📝',
+    items: (c.items || []).map(it => typeof it === 'string' ? { name: it, emoji: '' } : { name: it.name, emoji: it.emoji || '' })
   }));
-  document.getElementById('qiAssessBtn').addEventListener('click', () => {
-    if (Object.keys(answers).length < QI_QUESTIONS.length) { showToast('请答完所有问题'); return; }
-    renderQiResult(document.getElementById('qiResult'), answers);
-  });
-  document.getElementById('qiSaveLog').addEventListener('click', () => {
-    const all = Store.get('qiLogs', []);
-    const idx = all.findIndex(l => l.date === Store.today());
-    const entry = { date: Store.today(), sleep: document.getElementById('qiSleep').value, diet: document.getElementById('qiDiet').value.trim(), foot: document.getElementById('qiFoot').value, timestamp: Date.now() };
-    if (idx >= 0) all[idx] = entry; else all.unshift(entry);
-    Store.set('qiLogs', all); showToast('已保存今日记录 ✅'); renderQi(el, container);
-  });
 }
 
-function renderQiResult(area, a) {
-  const cold = a.cold, tired = a.tired, sleep = a.sleep, period = a.period, face = a.face, hair = a.hair, mood = a.mood, appetite = a.appetite;
-  const qiXu = tired >= 1 || face >= 1 || hair >= 1;     // 气虚/血虚
-  const han = cold >= 1;                                  // 阳虚怕冷
-  const yu = mood >= 1;                                   // 肝郁
-  let title = '状态良好', advice = '继续保持规律作息与均衡饮食。';
-  if (qiXu && han) { title = '气血两虚·偏寒'; advice = '以温补气血为主，忌生冷。'; }
-  else if (qiXu) { title = '气血不足'; advice = '重在补气血、健脾养胃。'; }
-  else if (han) { title = '阳虚怕冷'; advice = '温阳驱寒，多注意保暖与泡脚。'; }
-  else if (yu) { title = '肝郁气滞'; advice = '疏肝理气，调畅情志。'; }
-
-  const teas = [];
-  if (qiXu || han) teas.push('红枣枸杞茶', '桂圆红枣茶', '黄芪当归茶');
-  if (yu) teas.push('玫瑰花茶', '陈皮茶');
-  if (sleep === 2) teas.push('酸枣仁百合茶');
-  if (!teas.length) teas.push('枸杞菊花茶');
-
-  const exercises = han ? ['八段锦·双手托天理三焦', '踮脚提踵促循环', '睡前温水泡脚后搓脚心'] : ['八段锦', '拍八虚（肘窝/腘窝）', '舒展拉伸'];
-
-  const acupoints = [];
-  if (qiXu || han) acupoints.push('足三里（健脾）', '三阴交（调血）', '关元穴（培元）');
-  if (yu) acupoints.push('太冲穴（疏肝）', '期门穴');
-  if (hair >= 1 || face >= 1) acupoints.push('血海穴（养血）');
-  if (!acupoints.length) acupoints.push('足三里', '三阴交');
-
-  const foot = han ? '生姜花椒水泡脚（水温约40-42℃，15-20分钟，微微出汗即可）' : '温水泡脚 15-20 分钟，引血下行助眠';
-
-  area.innerHTML = `
-    <div class="card qi-result-card">
-      <div class="card-title">🩺 测评结果：${title}</div>
-      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px">${advice}</div>
-      <div class="qi-rec-block"><div class="qi-rec-head">🍵 推荐茶饮</div>${teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-      <div class="qi-rec-block"><div class="qi-rec-head">🤸 推荐健身操</div>${exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-      <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位按摩</div>${acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-      <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚建议</div><div class="qi-rec-item">${foot}</div></div>
-    </div>
-  `;
-  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function findItemEmoji(categories, catName, itemName) {
+  const cat = categories.find(c => c.name === catName);
+  if (!cat) return '';
+  const it = cat.items.find(i => i.name === itemName);
+  return it ? it.emoji : '';
 }
 
-// ========== 模块7: 各种记录（自定义打卡 + 日期下显示项目emoji） ==========
 function renderHealthRecords(el) {
-  const categories = Store.get('healthRecordCategories', getDefaultHealthRecords());
+  const categories = normalizeHealthRecords(Store.get('healthRecordCategories', getDefaultHealthRecords()));
   const records = Store.get('healthRecords', []);
-  const emojis = Store.get('healthItemEmojis', {});
   const today = Store.today();
   const now = new Date();
   const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -784,15 +720,19 @@ function renderHealthRecords(el) {
   for (let i = -3; i <= 3; i++) { const d = new Date(); d.setDate(d.getDate() + i); dateItems.push(d); }
   const dayRecords = records.filter(r => r.date === selectedDate);
   const monthRecords = records.filter(r => r.date.startsWith(monthStr));
+  // 当月每天收集该项目 emoji（找不到则用分类图标兜底）
   const monthDayEmojis = {};
-  monthRecords.forEach(r => { const key = r.category + '|' + r.item; (monthDayEmojis[r.date] = monthDayEmojis[r.date] || new Set()); const e = emojis[key]; if (e) monthDayEmojis[r.date].add(e); });
+  monthRecords.forEach(r => {
+    const e = findItemEmoji(categories, r.category, r.item) || (categories.find(c => c.name === r.category) || {}).icon || '✅';
+    (monthDayEmojis[r.date] = monthDayEmojis[r.date] || new Set()).add(e);
+  });
 
   el.innerHTML = `
     <div class="date-picker-h" id="recordDatePicker">
       ${dateItems.map(d => { const ds = formatDate(d); const isToday = ds === today; return `<div class="date-picker-item ${isToday?'today':''} ${ds===selectedDate?'selected':''}" data-date="${ds}"><div class="dp-weekday">${['日','一','二','三','四','五','六'][d.getDay()]}</div><div class="dp-day">${d.getDate()}</div></div>`; }).join('')}
     </div>
     <div class="card">
-      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">📝 ${formatDateCN(selectedDate)} 记录</div><span style="font-size:12px;color:var(--text-muted)">${dayRecords.length} 条</span></div>
+      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">📝 ${formatDateCN(selectedDate)} 记录</div><span style="font-size:12px;color:var(--text-muted)">${dayRecords.length} 条 · 点一下=有，再点=取消</span></div>
       ${categories.map(cat => {
         const catRecords = dayRecords.filter(r => r.category === cat.name);
         return `<div style="margin-bottom:16px">
@@ -802,11 +742,11 @@ function renderHealthRecords(el) {
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             ${cat.items.map(item => {
-              const done = catRecords.some(r => r.item === item);
-              const e = emojis[cat.name + '|' + item] || '';
-              return `<div class="record-row" data-category="${escapeHtml(cat.name)}" data-item="${escapeHtml(item)}">
-                <button class="record-emoji-btn" data-category="${escapeHtml(cat.name)}" data-item="${escapeHtml(item)}" title="点击设置emoji">${e || '➕'}</button>
-                <button class="record-chip ${done?'active':''}">${escapeHtml(item)} ${done ? '✓' : ''}</button>
+              const done = catRecords.some(r => r.item === item.name);
+              const e = item.emoji || cat.icon;
+              return `<div class="record-row" data-category="${escapeHtml(cat.name)}" data-item="${escapeHtml(item.name)}">
+                <button class="record-emoji-btn" data-category="${escapeHtml(cat.name)}" data-item="${escapeHtml(item.name)}" title="点击设置emoji">${e}</button>
+                <button class="record-chip ${done?'active':''}">${escapeHtml(item.name)} ${done ? '✓' : ''}</button>
               </div>`;
             }).join('')}
           </div>
@@ -829,30 +769,34 @@ function renderHealthRecords(el) {
         }).join('')}
       </div>
     </div>
-    <div class="card"><div class="card-title">📋 历史记录</div>${renderHealthRecordHistory(records)}</div>
+    <div class="card"><div class="card-title">📋 历史记录</div>${renderHealthRecordHistory(records, categories)}</div>
   `;
   el.querySelectorAll('.date-picker-item').forEach(d => { d.addEventListener('click', () => { selectedDate = d.dataset.date; renderHealthRecords(el); }); });
   el.querySelectorAll('.record-chip').forEach(chip => { chip.addEventListener('click', () => { const row = chip.closest('.record-row'); const cat = row.dataset.category; const item = row.dataset.item; const allRecords = Store.get('healthRecords', []); const idx = allRecords.findIndex(r => r.date === selectedDate && r.category === cat && r.item === item); if (idx >= 0) allRecords.splice(idx, 1); else allRecords.push({ id: Store.uid(), date: selectedDate, category: cat, item, timestamp: Date.now() }); Store.set('healthRecords', allRecords); renderHealthRecords(el); }); });
-  el.querySelectorAll('.record-emoji-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const cat = btn.dataset.category, item = btn.dataset.item; const emojis = Store.get('healthItemEmojis', {}); showEmojiPicker(emojis[cat + '|' + item] || '', (emo) => { emojis[cat + '|' + item] = emo; Store.set('healthItemEmojis', emojis); renderHealthRecords(el); }); }); });
-  el.querySelectorAll('.health-add-item').forEach(btn => { btn.addEventListener('click', () => { showHealthItemModal(btn.dataset.category, '', '', (name, emoji) => { if (!name) return; const cats = Store.get('healthRecordCategories', getDefaultHealthRecords()); const cat = cats.find(c => c.name === btn.dataset.category); if (cat) { cat.items.push(name); if (emoji) { const emojis = Store.get('healthItemEmojis', {}); emojis[cat.name + '|' + name] = emoji; Store.set('healthItemEmojis', emojis); } Store.set('healthRecordCategories', cats); renderHealthRecords(el); } }); }); });
+  el.querySelectorAll('.record-emoji-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const cat = btn.dataset.category, item = btn.dataset.item; const cats = normalizeHealthRecords(Store.get('healthRecordCategories', getDefaultHealthRecords())); const c = cats.find(x => x.name === cat); const it = c ? c.items.find(x => x.name === item) : null; showEmojiPicker(it ? it.emoji : '', (emo) => { const stored = Store.get('healthRecordCategories', getDefaultHealthRecords()); const sc = stored.find(x => x.name === cat); if (sc) { const si = sc.items.find(x => x.name === item); if (si) si.emoji = emo; } Store.set('healthRecordCategories', stored); renderHealthRecords(el); }); }); });
+  el.querySelectorAll('.health-add-item').forEach(btn => { btn.addEventListener('click', () => { showHealthItemModal(btn.dataset.category, '', '', (name, emoji) => { if (!name) return; const cats = Store.get('healthRecordCategories', getDefaultHealthRecords()); const cat = cats.find(c => c.name === btn.dataset.category); if (cat) { cat.items.push({ name, emoji: emoji || '' }); Store.set('healthRecordCategories', cats); renderHealthRecords(el); } }); }); });
   el.querySelectorAll('.health-cat-del').forEach(btn => { btn.addEventListener('click', () => { const name = btn.dataset.name; let cats = Store.get('healthRecordCategories', getDefaultHealthRecords()); cats = cats.filter(c => c.name !== name); Store.set('healthRecordCategories', cats); renderHealthRecords(el); }); });
   document.getElementById('addHealthCatBtn').addEventListener('click', () => { showDualInputModal('添加记录分类', '分类名称', '图标 (emoji)', '📝', (name, icon) => { if (!name) return; const cats = Store.get('healthRecordCategories', getDefaultHealthRecords()); cats.push({ name, icon: icon || '📝', items: [] }); Store.set('healthRecordCategories', cats); renderHealthRecords(el); }); });
 }
 
-function renderHealthRecordHistory(records) {
+function renderHealthRecordHistory(records, categories) {
   if (records.length === 0) return '<div class="empty-state"><div class="empty-state-text">暂无记录</div></div>';
-  const emojis = Store.get('healthItemEmojis', {});
   const groups = Store.groupByDate(records);
-  return groups.slice(0, 15).map(([date, items]) => `<div class="date-fold"><div class="date-fold-header" onclick="this.parentElement.classList.toggle('open')"><svg class="date-fold-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${formatDateCN(date)}<span class="date-fold-count">${items.length} 条</span></div><div class="date-fold-body">${items.map(r => `<div class="todo-item"><div style="font-size:16px;margin-right:4px">${emojis[r.category+'|'+r.item]||''}</div><div class="todo-content"><div class="todo-text">${escapeHtml(r.category)} · ${escapeHtml(r.item)}</div></div></div>`).join('')}</div></div>`).join('');
+  return groups.slice(0, 15).map(([date, items]) => `<div class="date-fold"><div class="date-fold-header" onclick="this.parentElement.classList.toggle('open')"><svg class="date-fold-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${formatDateCN(date)}<span class="date-fold-count">${items.length} 条</span></div><div class="date-fold-body">${items.map(r => `<div class="todo-item"><div style="font-size:16px;margin-right:4px">${findItemEmoji(categories, r.category, r.item) || '✅'}</div><div class="todo-content"><div class="todo-text">${escapeHtml(r.category)} · ${escapeHtml(r.item)}</div></div></div>`).join('')}</div></div>`).join('');
 }
 
 function getDefaultHealthRecords() {
   return [
-    { name: '大便', icon: '💩', items: ['正常', '便秘', '腹泻', '未记录'] },
-    { name: '月经', icon: '🩸', items: ['经期第1天', '经期第2天', '经期第3天', '经期第4天', '经期第5天', '经前症状'] },
-    { name: '奶茶/饮品', icon: '🧋', items: ['喝了奶茶', '喝了咖啡', '喝了饮料', '今天没喝'] },
-    { name: '睡眠', icon: '😴', items: ['睡够8小时', '熬夜了', '失眠', '午睡'] },
-    { name: '心情', icon: '😊', items: ['开心', '一般', '低落', '焦虑', '生气'] }
+    { name: '每日打卡', icon: '📌', items: [
+      { name: '喝水', emoji: '💧' }, { name: '吃早餐', emoji: '🍳' }, { name: '吃水果', emoji: '🍎' },
+      { name: '运动', emoji: '🏃' }, { name: '泡脚', emoji: '🦶' }, { name: '早睡', emoji: '😴' }
+    ]},
+    { name: '身体状态', icon: '🌿', items: [
+      { name: '大便正常', emoji: '💩' }, { name: '心情好', emoji: '😊' }, { name: '皮肤好', emoji: '✨' }
+    ]},
+    { name: '饮品', icon: '🧋', items: [
+      { name: '奶茶', emoji: '🧋' }, { name: '咖啡', emoji: '☕' }, { name: '养生茶', emoji: '🍵' }
+    ]}
   ];
 }
 

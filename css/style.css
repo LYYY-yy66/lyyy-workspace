@@ -93,6 +93,11 @@ body {
   flex-shrink: 0;
 }
 .sync-dot.connected { background: var(--success); }
+.sync-dot.local { background: var(--text-muted); }
+.sync-dot.syncing { background: var(--primary); animation: pulse 1s infinite; }
+.sync-dot.synced { background: var(--success); }
+.sync-dot.error { background: #e05a5a; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 /* ========== Sidebar ========== */
 .sidebar-overlay {
@@ -1109,6 +1114,23 @@ body {
 .qi-rec-block { margin-bottom: 12px; }
 .qi-rec-head { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
 .qi-rec-item { font-size: 13px; color: var(--text-secondary); padding: 4px 0; }
+
+/* 养生方向 chips */
+.qi-dir-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px; border-radius: 20px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.qi-dir-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.qi-dir-check { font-size: 11px; }
+.qi-dir-del {
+  margin-left: 2px; border: none; background: transparent;
+  color: var(--text-muted); font-size: 15px; line-height: 1;
+  cursor: pointer; padding: 0 2px; border-radius: 50%;
+}
+.qi-dir-chip.active .qi-dir-del { color: rgba(255,255,255,0.8); }
+.qi-dir-del:hover { color: #e05a5a; }
 
 /* ========== Records Calendar Emoji ========== */
 .rec-cal {

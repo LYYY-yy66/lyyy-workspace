@@ -2,6 +2,7 @@
  * app.js — 主应用入口、路由、侧边栏、计时器
  */
 import { Store } from './store.js';
+import { initSync } from './sync.js';
 import { TodoPage } from './pages/todo.js';
 import { HealthPage } from './pages/health.js';
 import { EnglishPage } from './pages/english.js';
@@ -16,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initSidebar();
   initTimer();
   navigateTo(Store.get('currentPage', 'todo'));
+  // 跨设备云端同步（若有 token 则自动拉取；点击顶栏/侧栏状态可设置）
+  initSync(() => navigateTo(currentPage));
 });
 
 // ========== 路由导航 ==========
@@ -226,3 +229,4 @@ function showToast(msg) {
 }
 
 export { showToast };
+window.showToast = showToast;
