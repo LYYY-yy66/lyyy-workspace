@@ -984,3 +984,171 @@ body {
   border-color: var(--primary);
   box-shadow: 0 2px 8px rgba(124,156,191,0.25);
 }
+
+/* ========== Video Player (全平台) ========== */
+.video-card { margin-top: 4px; cursor: pointer; }
+.video-thumb {
+  position: relative;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #2c3e50, #5a7fa3);
+  aspect-ratio: 16 / 9;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden; color: #fff;
+  transition: transform 0.2s;
+}
+.video-card:active .video-thumb { transform: scale(0.99); }
+.video-platform-badge {
+  position: absolute; top: 10px; left: 10px;
+  font-size: 11px; font-weight: 600;
+  background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 12px;
+}
+.video-play-btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.9); color: #2c3e50;
+  border: none; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.video-play-btn:active { transform: scale(0.9); }
+.video-title {
+  position: absolute; bottom: 10px; left: 12px; right: 12px;
+  font-size: 13px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.video-hint { font-size: 11px; opacity: 0.7; margin-top: 8px; }
+.video-frame-wrap { border-radius: var(--radius); overflow: hidden; }
+.video-frame { width: 100%; aspect-ratio: 16 / 9; border: none; display: block; }
+.video-source-link {
+  display: inline-block; margin-top: 8px; font-size: 12px;
+  color: var(--primary); text-decoration: none;
+}
+
+/* ========== Reading (外刊逐句翻译) ========== */
+.reading-article-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; background: var(--bg);
+  border-radius: var(--radius); cursor: pointer;
+  border: 2px solid transparent; transition: all 0.2s;
+}
+.reading-article-item.active { border-color: var(--primary); background: rgba(124,156,191,0.08); }
+.reading-article-item:hover { background: #eef2f7; }
+.reading-list { display: flex; flex-direction: column; gap: 8px; }
+.reading-sentence {
+  padding: 12px; background: var(--bg);
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: background 0.2s;
+}
+.reading-sentence:hover { background: #eef2f7; }
+.reading-en { font-size: 14px; color: var(--text-primary); line-height: 1.7; }
+.reading-zh {
+  font-size: 13px; color: var(--text-secondary);
+  margin-top: 6px; line-height: 1.6; display: none;
+}
+.reading-sentence.show-translation .reading-zh { display: block; }
+.reading-loading { color: var(--text-muted); font-style: italic; }
+.reading-manual { color: var(--text-muted); font-size: 12px; }
+.reading-manual-input { margin-top: 6px; }
+.listening-item, .follow-item, .kitchen-item {
+  padding: 14px; background: var(--bg);
+  border-radius: var(--radius); margin-bottom: 10px;
+}
+
+/* ========== Reward Badges ========== */
+.reward-badge {
+  text-align: center; padding: 14px 8px;
+  background: var(--bg); border-radius: var(--radius);
+  border: 1.5px dashed var(--border); opacity: 0.6;
+  transition: all 0.25s;
+}
+.reward-badge.unlocked {
+  opacity: 1; border-style: solid;
+  border-color: var(--success); background: rgba(123,196,168,0.1);
+  box-shadow: 0 2px 10px rgba(123,196,168,0.2);
+}
+.reward-emoji { font-size: 28px; }
+.reward-name { font-size: 13px; font-weight: 600; margin-top: 6px; color: var(--text-primary); }
+.reward-desc { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+/* ========== Kitchen ========== */
+.kitchen-type-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  font-weight: 600; margin-right: 4px;
+}
+.type-菜品 { background: #fde8e8; color: #d98a8a; }
+.type-食材 { background: #d4edda; color: #5a9e7a; }
+.type-调料 { background: #fef3cd; color: #c79a3a; }
+.kitchen-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
+
+/* ========== Recipe ========== */
+.recipe-profile-summary, .recipe-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.recipe-profile-summary { margin-bottom: 14px; }
+.recipe-stat, .recipe-metric { text-align: center; padding: 12px 6px; background: var(--bg); border-radius: var(--radius); }
+.recipe-stat-value, .recipe-metric-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+.recipe-stat-label, .recipe-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.recipe-day { background: var(--bg); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+.recipe-day-head { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
+.recipe-meal { display: flex; gap: 10px; padding: 6px 0; align-items: flex-start; }
+.recipe-meal-name { font-size: 13px; font-weight: 600; min-width: 56px; color: var(--text-secondary); flex-shrink: 0; }
+.recipe-meal-items { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.recipe-food { font-size: 13px; color: var(--text-primary); }
+.recipe-food i { font-size: 11px; color: var(--text-muted); font-style: normal; margin-left: 4px; }
+
+/* ========== Qi (养出好气血) ========== */
+.qi-question { margin-bottom: 14px; }
+.qi-q-text { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); }
+.qi-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.qi-opt {
+  padding: 7px 16px; border-radius: 18px;
+  border: 1.5px solid var(--border); background: var(--bg-card);
+  color: var(--text-secondary); font-size: 13px; cursor: pointer;
+  transition: all 0.2s;
+}
+.qi-opt:hover { border-color: var(--primary-light); color: var(--primary); }
+.qi-opt.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.qi-result-card { border: 1.5px solid var(--success); }
+.qi-rec-block { margin-bottom: 12px; }
+.qi-rec-head { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+.qi-rec-item { font-size: 13px; color: var(--text-secondary); padding: 4px 0; }
+
+/* ========== Records Calendar Emoji ========== */
+.rec-cal {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  margin-top: 12px;
+}
+.rec-cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 4px 2px; border-radius: var(--radius-sm);
+  background: var(--bg); font-size: 12px; position: relative;
+  transition: all 0.2s;
+}
+.rec-cal-day.today { border: 2px solid var(--primary); }
+.rec-cal-day.other-month { opacity: 0.35; }
+.rec-cal-day.has-rec { background: rgba(123,196,168,0.15); }
+.rec-cal-num { font-weight: 600; }
+.rec-cal-emojis {
+  display: flex; flex-wrap: wrap; gap: 1px; justify-content: center;
+  margin-top: 2px; line-height: 1; font-size: 11px;
+}
+.record-row { display: flex; align-items: center; gap: 4px; }
+.record-emoji-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1px dashed var(--border); background: var(--bg-card);
+  font-size: 15px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; padding: 0;
+}
+.record-emoji-btn:hover { border-color: var(--primary); background: rgba(124,156,191,0.08); }
+
+/* ========== Emoji Picker ========== */
+.emoji-grid {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
+  max-height: 320px; overflow-y: auto;
+}
+.emoji-cell {
+  aspect-ratio: 1; border: none; background: transparent;
+  font-size: 20px; border-radius: 8px; cursor: pointer;
+  transition: all 0.15s; padding: 0;
+}
+.emoji-cell:hover { background: var(--bg); }
+.emoji-cell.selected { background: var(--primary); box-shadow: 0 2px 6px rgba(124,156,191,0.3); }
