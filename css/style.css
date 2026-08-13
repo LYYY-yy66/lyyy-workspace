@@ -79,26 +79,6 @@ body {
   color: var(--text-primary);
 }
 
-.sync-indicator {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: var(--text-secondary);
-  padding: 4px 10px;
-  background: var(--bg);
-  border-radius: 20px;
-}
-.sync-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--warning);
-  flex-shrink: 0;
-}
-.sync-dot.connected { background: var(--success); }
-.sync-dot.local { background: var(--text-muted); }
-.sync-dot.syncing { background: var(--primary); animation: pulse 1s infinite; }
-.sync-dot.synced { background: var(--success); }
-.sync-dot.error { background: #e05a5a; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
 /* ========== Sidebar ========== */
 .sidebar-overlay {
   display: none;
@@ -174,10 +154,6 @@ body {
 .sidebar-footer {
   padding: 16px 20px;
   border-top: 1px solid var(--border);
-}
-.sync-status-full {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--text-muted);
 }
 
 /* ========== Main Content ========== */
@@ -1208,13 +1184,18 @@ body {
 
 /* ===== 养生7天计划 ===== */
 .qi-week { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
-.qi-day { flex: 0 0 158px; border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 10px; background: #fff; }
+.qi-day { flex: 0 0 158px; border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 10px; background: #fff; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s, background 0.12s; }
+.qi-day:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,156,191,0.18); }
+.qi-day:active { transform: scale(0.98); }
 .qi-day.weekend { background: #fdf6ec; border-color: #f3e0c0; }
 .qi-day.today { border-color: var(--primary); box-shadow: 0 2px 8px rgba(124,156,191,0.25); }
+.qi-day.done { background: #eef7f0; border-color: var(--success, #7bc4a8); }
+.qi-day.done .qi-rec-item { text-decoration: line-through; color: var(--text-muted); }
 .qi-day-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-weight: 600; }
 .qi-day-name { font-size: 14px; }
 .qi-day-date { font-size: 11px; color: var(--text-muted); }
 .qi-day-tag { margin-left: auto; font-size: 10px; background: #f3e0c0; color: #a9712b; padding: 1px 6px; border-radius: 8px; }
+.qi-day-check { margin-left: auto; font-size: 10px; background: var(--success, #7bc4a8); color: #fff; padding: 1px 6px; border-radius: 8px; }
 
 /* ===== 开关 switch ===== */
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -1233,6 +1214,16 @@ body {
 .growth-fav.active { color: #f1c40f; }
 .growth-card-method { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; }
 .growth-card-case { font-size: 13px; color: var(--text-primary); line-height: 1.6; background: var(--bg); padding: 8px 10px; border-radius: var(--radius-sm); }
+
+/* ===== 新闻热榜 ===== */
+.news-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.news-item { display: flex; flex-direction: column; gap: 4px; padding: 9px 12px; background: var(--bg); border-radius: var(--radius-sm); }
+.news-title { font-size: 14px; color: var(--text-primary); line-height: 1.45; }
+.news-meta { display: flex; align-items: center; gap: 10px; }
+.news-hot { font-size: 11px; color: #e8746b; background: rgba(232,116,107,0.12); padding: 1px 7px; border-radius: 8px; flex-shrink: 0; }
+.news-link { font-size: 12px; color: var(--primary); text-decoration: none; flex-shrink: 0; }
+.news-link:hover { text-decoration: underline; }
+.news-item .growth-fav { margin-left: auto; font-size: 16px; }
 
 /* ===== 穿搭助手 ===== */
 .outfit-weather { margin-bottom: 12px; }

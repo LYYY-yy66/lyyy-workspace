@@ -195,7 +195,7 @@ function renderWater(el) {
     </div>
     <div class="card">
       <div class="card-title">📈 最近 7 天喝水趋势</div>
-      <canvas id="waterTrend" height="150"></canvas>
+      <div style="position:relative;height:110px"><canvas id="waterTrend"></canvas></div>
     </div>
     <div class="card">
       <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">⏰ 定时喝水提醒</div>
@@ -852,6 +852,30 @@ function renderQi(el, container) {
     document.getElementById('qiPlanResult').innerHTML = qiWeekHtml(w, week.str);
     showToast('已重新生成本周计划 🌿');
   });
+  // 点任意一天卡片 → 打卡/取消「今天做到啦」
+  const planResult = document.getElementById('qiPlanResult');
+  if (planResult) {
+    planResult.addEventListener('click', (e) => {
+      const day = e.target.closest('[data-qdate]');
+      if (!day) return;
+      const date = day.dataset.qdate;
+      const doneMap = Store.get('qiDone', {});
+      const nowDone = !doneMap[date];
+      if (nowDone) doneMap[date] = true; else delete doneMap[date];
+      Store.set('qiDone', doneMap);
+      day.classList.toggle('done', nowDone);
+      const head = day.querySelector('.qi-day-head');
+      const old = head.querySelector('.qi-day-check');
+      if (old) old.remove();
+      if (nowDone) {
+        const span = document.createElement('span');
+        span.className = 'qi-day-check';
+        span.textContent = '✓ 已打卡';
+        head.appendChild(span);
+      }
+      showToast(nowDone ? '已打卡，今天做到啦 🌿' : '已取消打卡');
+    });
+  }
 }
 
 function generateQiWeek() {
@@ -885,17 +909,20 @@ function generateQiWeek() {
 
 function qiWeekHtml(w, weekStart) {
   const today = Store.today();
+  const done = Store.get('qiDone', {});
   return `<div class="card" style="padding:14px"><div class="card-title">🌿 本周养生计划（${w.dirs.join(' / ')}）</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${formatDateCN(weekStart)} 起 · 工作日精简、周末（${w.dirs.includes('养气血') ? '可加煲汤/艾灸' : '可加料'}）更充裕 · 仅供参考不替代医疗诊断</div>
-    <div class="qi-week">${w.days.map(d => `
-      <div class="qi-day ${d.date === today ? 'today' : ''} ${d.isWeekend ? 'weekend' : ''}">
-        <div class="qi-day-head"><span class="qi-day-name">${d.label}</span><span class="qi-day-date">${d.date.slice(5)}</span>${d.isWeekend ? '<span class="qi-day-tag">周末</span>' : ''}</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${formatDateCN(weekStart)} 起 · 工作日精简、周末（${w.dirs.includes('养气血') ? '可加煲汤/艾灸' : '可加料'}）更充裕 · <b>点任意一天的卡片即可打卡「今天做到啦」</b> · 仅供参考不替代医疗诊断</div>
+    <div class="qi-week">${w.days.map(d => {
+      const isDone = !!done[d.date];
+      return `<div class="qi-day ${d.date === today ? 'today' : ''} ${d.isWeekend ? 'weekend' : ''} ${isDone ? 'done' : ''}" data-qdate="${d.date}">
+        <div class="qi-day-head"><span class="qi-day-name">${d.label}</span><span class="qi-day-date">${d.date.slice(5)}</span>${d.isWeekend ? '<span class="qi-day-tag">周末</span>' : ''}${isDone ? '<span class="qi-day-check">✓ 已打卡</span>' : ''}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">🍵 茶饮</div>${d.teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">🥗 食饮</div>${d.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">🤸 健身操</div>${d.exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位</div>${d.acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚</div><div class="qi-rec-item">${d.foot}</div></div>
-      </div>`).join('')}</div>
+      </div>`;
+    }).join('')}</div>
     ${w.unknown && w.unknown.length ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">自定义方向（${w.unknown.join('、')}）暂无内置资料，建议自行查阅。</div>` : ''}
     <button class="btn btn-secondary btn-sm" id="qiRegen" style="width:100%;margin-top:10px">🔄 重新生成本周计划</button>
   </div>`;
