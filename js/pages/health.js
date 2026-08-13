@@ -863,15 +863,10 @@ function renderQi(el, container) {
       const nowDone = !doneMap[date];
       if (nowDone) doneMap[date] = true; else delete doneMap[date];
       Store.set('qiDone', doneMap);
-      day.classList.toggle('done', nowDone);
-      const head = day.querySelector('.qi-day-head');
-      const old = head.querySelector('.qi-day-check');
-      if (old) old.remove();
-      if (nowDone) {
-        const span = document.createElement('span');
-        span.className = 'qi-day-check';
-        span.textContent = '✓ 已打卡';
-        head.appendChild(span);
+      const cur = Store.get('qiWeek', null);
+      const wk = weekMonday();
+      if (cur && cur.weekStart === wk.str) {
+        document.getElementById('qiPlanResult').innerHTML = qiWeekHtml(cur, wk.str);
       }
       showToast(nowDone ? '已打卡，今天做到啦 🌿' : '已取消打卡');
     });
@@ -910,7 +905,7 @@ function generateQiWeek() {
 function qiWeekHtml(w, weekStart) {
   const today = Store.today();
   const done = Store.get('qiDone', {});
-  return `<div class="card" style="padding:14px"><div class="card-title">🌿 本周养生计划（${w.dirs.join(' / ')}）</div>
+  return `<div class="card" style="padding:14px">${qiStatsHtml(done)}<div class="card-title">🌿 本周养生计划（${w.dirs.join(' / ')}）</div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${formatDateCN(weekStart)} 起 · 工作日精简、周末（${w.dirs.includes('养气血') ? '可加煲汤/艾灸' : '可加料'}）更充裕 · <b>点任意一天的卡片即可打卡「今天做到啦」</b> · 仅供参考不替代医疗诊断</div>
     <div class="qi-week">${w.days.map(d => {
       const isDone = !!done[d.date];
@@ -925,6 +920,29 @@ function qiWeekHtml(w, weekStart) {
     }).join('')}</div>
     ${w.unknown && w.unknown.length ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">自定义方向（${w.unknown.join('、')}）暂无内置资料，建议自行查阅。</div>` : ''}
     <button class="btn btn-secondary btn-sm" id="qiRegen" style="width:100%;margin-top:10px">🔄 重新生成本周计划</button>
+  </div>`;
+}
+
+function qiStatsHtml(done) {
+  const week = weekMonday();
+  const base = new Date(week.obj);
+  const days = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(d.getDate() + i); days.push(formatDate(d)); }
+  const doneWeek = days.filter(dt => done[dt]).length;
+  const today = new Date();
+  let streak = 0;
+  for (let i = 0; i < 400; i++) { const d = new Date(today); d.setDate(d.getDate() - i); const ds = formatDate(d); if (done[ds]) streak++; else break; }
+  const m = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+  let monthTotal = 0; Object.keys(done).forEach(dt => { if (dt.startsWith(m)) monthTotal++; });
+  const pct = Math.round(doneWeek / 7 * 100);
+  return `<div class="qi-stat-card">
+    <div style="display:flex;gap:10px">
+      <div class="qi-stat"><div class="qi-stat-num">${doneWeek}<span style="font-size:13px;color:var(--text-muted)">/7</span></div><div class="qi-stat-label">本周打卡</div></div>
+      <div class="qi-stat"><div class="qi-stat-num">${streak}</div><div class="qi-stat-label">连续天数</div></div>
+      <div class="qi-stat"><div class="qi-stat-num">${monthTotal}</div><div class="qi-stat-label">本月累计</div></div>
+    </div>
+    <div class="qi-stat-bar"><div class="qi-stat-bar-fill" style="width:${pct}%"></div></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:6px">本周完成度 ${pct}%</div>
   </div>`;
 }
 

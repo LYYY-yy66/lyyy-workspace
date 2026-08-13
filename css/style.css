@@ -1196,6 +1196,12 @@ body {
 .qi-day-date { font-size: 11px; color: var(--text-muted); }
 .qi-day-tag { margin-left: auto; font-size: 10px; background: #f3e0c0; color: #a9712b; padding: 1px 6px; border-radius: 8px; }
 .qi-day-check { margin-left: auto; font-size: 10px; background: var(--success, #7bc4a8); color: #fff; padding: 1px 6px; border-radius: 8px; }
+.qi-stat-card { background: linear-gradient(135deg, #f3f8ff 0%, #eef7f0 100%); border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; }
+.qi-stat { flex: 1; text-align: center; }
+.qi-stat-num { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.qi-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.qi-stat-bar { height: 8px; background: #e3e9f0; border-radius: 6px; overflow: hidden; margin-top: 10px; }
+.qi-stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--success, #7bc4a8)); border-radius: 6px; transition: width 0.3s; }
 
 /* ===== 开关 switch ===== */
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }

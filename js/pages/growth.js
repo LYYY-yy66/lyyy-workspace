@@ -103,51 +103,74 @@ const GROWTH_LIB = {
   ],
 };
 
-const NEWS_FALLBACK = { date: "2026-08-13", sections: [
+const NEWS_FALLBACK = { date: '2026-08-13', sections: [
   { name: '抖音热议', icon: '🔥', items: [
-    { title: "朱镕基同志逝世", link: "https://www.douyin.com/search/%E6%9C%B1%E9%95%95%E5%9F%BA%E5%90%8C%E5%BF%97%E9%80%9D%E4%B8%96", hot: 12155642 },
-    { title: "新台风浪卡生成", link: "https://www.douyin.com/search/%E6%96%B0%E5%8F%B0%E9%A3%8E%E6%B5%AA%E5%8D%A1%E7%94%9F%E6%88%90", hot: 10878303 },
-    { title: "我国加快自然资源一张图建设", link: "https://www.douyin.com/search/%E6%88%91%E5%9B%BD%E5%8A%A0%E5%BF%AB%E8%87%AA%E7%84%B6%E8%B5%84%E6%BA%90%E4%B8%80%E5%BC%A0%E5%9B%BE%E5%BB%BA%E8%AE%BE", hot: 10841798 },
-    { title: "威少宣布退役", link: "https://www.douyin.com/search/%E5%A8%81%E5%B0%91%E5%AE%A3%E5%B8%83%E9%80%80%E5%BD%B9", hot: 10772663 },
-    { title: "白海豚给河南下的雨有多大", link: "https://www.douyin.com/search/%E7%99%BD%E6%B5%B7%E8%B1%9A%E7%BB%99%E6%B2%B3%E5%8D%97%E4%B8%8B%E7%9A%84%E9%9B%A8%E6%9C%89%E5%A4%9A%E5%A4%A7", hot: 10182202 },
-    { title: "看看我拍到的英仙座流星雨吧", link: "https://www.douyin.com/search/%E7%9C%8B%E7%9C%8B%E6%88%91%E6%8B%8D%E5%88%B0%E7%9A%84%E8%8B%B1%E4%BB%99%E5%BA%A7%E6%B5%81%E6%98%9F%E9%9B%A8%E5%90%A7", hot: 10026962 },
-    { title: "第一批拍流星雨的摄影师已出片", link: "https://www.douyin.com/search/%E7%AC%AC%E4%B8%80%E6%89%B9%E6%8B%8D%E6%B5%81%E6%98%9F%E9%9B%A8%E7%9A%84%E6%91%84%E5%BD%B1%E5%B8%88%E5%B7%B2%E5%87%BA%E7%89%87", hot: 8791718 },
-    { title: "我选择海岛作为我生活的解药", link: "https://www.douyin.com/search/%E6%88%91%E9%80%89%E6%8B%A9%E6%B5%B7%E5%B2%9B%E4%BD%9C%E4%B8%BA%E6%88%91%E7%94%9F%E6%B4%BB%E7%9A%84%E8%A7%A3%E8%8D%AF", hot: 8563408 },
-    { title: "一条视频了解英仙座流星雨", link: "https://www.douyin.com/search/%E4%B8%80%E6%9D%A1%E8%A7%86%E9%A2%91%E4%BA%86%E8%A7%A3%E8%8B%B1%E4%BB%99%E5%BA%A7%E6%B5%81%E6%98%9F%E9%9B%A8", hot: 8405293 },
-    { title: "硬核运镜闯8D重庆太丝滑了", link: "https://www.douyin.com/search/%E7%A1%AC%E6%A0%B8%E8%BF%90%E9%95%9C%E9%97%AF8D%E9%87%8D%E5%BA%86%E5%A4%AA%E4%B8%9D%E6%BB%91%E4%BA%86", hot: 7828816 },
-    { title: "穿搭改变环境", link: "https://www.douyin.com/search/%E7%A9%BF%E6%90%AD%E6%94%B9%E5%8F%98%E7%8E%AF%E5%A2%83", hot: 7744106 },
-    { title: "伦纳德百分大战定档", link: "https://www.douyin.com/search/%E4%BC%A6%E7%BA%B3%E5%BE%B7%E7%99%BE%E5%88%86%E5%A4%A7%E6%88%98%E5%AE%9A%E6%A1%A3", hot: 7742803 },
+    { title: '朱镕基同志逝世', link: 'https://www.douyin.com/search/%E6%9C%B1%E9%95%95%E5%9F%BA%E5%90%8C%E5%BF%97%E9%80%9D%E4%B8%96', hot: 0 },
+    { title: '新台风浪卡生成', link: 'https://www.douyin.com/search/%E6%96%B0%E5%8F%B0%E9%A3%8E%E6%B5%AA%E5%8D%A1%E7%94%9F%E6%88%90', hot: 0 },
+    { title: '我国加快自然资源一张图建设', link: 'https://www.douyin.com/search/%E6%88%91%E5%9B%BD%E5%8A%A0%E5%BF%AB%E8%87%AA%E7%84%B6%E8%B5%84%E6%BA%90%E4%B8%80%E5%BC%A0%E5%9B%BE%E5%BB%BA%E8%AE%BE', hot: 0 },
+    { title: '威少宣布退役', link: 'https://www.douyin.com/search/%E5%A8%81%E5%B0%91%E5%AE%A3%E5%B8%83%E9%80%80%E5%BD%B9', hot: 0 },
+    { title: '白海豚给河南下的雨有多大', link: 'https://www.douyin.com/search/%E7%99%BD%E6%B5%B7%E8%B1%9A%E7%BB%99%E6%B2%B3%E5%8D%97%E4%B8%8B%E7%9A%84%E9%9B%A8%E6%9C%89%E5%A4%9A%E5%A4%A7', hot: 0 },
+    { title: '看看我拍到的英仙座流星雨吧', link: 'https://www.douyin.com/search/%E7%9C%8B%E7%9C%8B%E6%88%91%E6%8B%8D%E5%88%B0%E7%9A%84%E8%8B%B1%E4%BB%99%E5%BA%A7%E6%B5%81%E6%98%9F%E9%9B%A8%E5%90%A7', hot: 0 },
+    { title: '我选择海岛作为我生活的解药', link: 'https://www.douyin.com/search/%E6%88%91%E9%80%89%E6%8B%A9%E6%B5%B7%E5%B2%9B%E4%BD%9C%E4%B8%BA%E6%88%91%E7%94%9F%E6%B4%BB%E7%9A%84%E8%A7%A3%E8%8D%AF', hot: 0 },
+    { title: '美卖欧元买日元 引发欧洲不满', link: 'https://www.douyin.com/search/%E7%BE%8E%E5%8D%96%E6%AC%A7%E5%85%83%E4%B9%B0%E6%97%A5%E5%85%83%20%E5%BC%95%E5%8F%91%E6%AC%A7%E6%B4%B2%E4%B8%8D%E6%BB%A1', hot: 0 },
+    { title: '台军“汉光演习”播放玩具枪声', link: 'https://www.douyin.com/search/%E5%8F%B0%E5%86%9B%E2%80%9C%E6%B1%89%E5%85%89%E6%BC%94%E4%B9%A0%E2%80%9D%E6%92%AD%E6%94%BE%E7%8E%A9%E5%85%B7%E6%9E%AA%E5%A3%B0', hot: 0 },
+    { title: '央行将开展隔夜逆回购操作', link: 'https://www.douyin.com/search/%E5%A4%AE%E8%A1%8C%E5%B0%86%E5%BC%80%E5%B1%95%E9%9A%94%E5%A4%9C%E9%80%86%E5%9B%9E%E8%B4%AD%E6%93%8D%E4%BD%9C', hot: 0 },
+    { title: '穿搭改变环境', link: 'https://www.douyin.com/search/%E7%A9%BF%E6%90%AD%E6%94%B9%E5%8F%98%E7%8E%AF%E5%A2%83', hot: 0 },
+    { title: '没有花一开始就是一朵花', link: 'https://www.douyin.com/search/%E6%B2%A1%E6%9C%89%E8%8A%B1%E4%B8%80%E5%BC%80%E5%A7%8B%E5%B0%B1%E6%98%AF%E4%B8%80%E6%9C%B5%E8%8A%B1', hot: 0 },
   ] },
   { name: '微博热搜', icon: '🔥', items: [
-    { title: "朱镕基同志逝世", link: "https://s.weibo.com/weibo?q=%E6%9C%B1%E9%95%95%E5%9F%BA%E5%90%8C%E5%BF%97%E9%80%9D%E4%B8%96", hot: 1041761 },
-    { title: "胖东来许昌老店关闭周边商户发声", link: "https://s.weibo.com/weibo?q=%E8%83%96%E4%B8%9C%E6%9D%A5%E8%AE%B8%E6%98%8C%E8%80%81%E5%BA%97%E5%85%B3%E9%97%AD%E5%91%A8%E8%BE%B9%E5%95%86%E6%88%B7%E5%8F%91%E5%A3%B0", hot: 989931 },
-    { title: "60万亿元消费蓝海要来了", link: "https://s.weibo.com/weibo?q=60%E4%B8%87%E4%BA%BF%E5%85%83%E6%B6%88%E8%B4%B9%E8%93%9D%E6%B5%B7%E8%A6%81%E6%9D%A5%E4%BA%86", hot: 926325 },
-    { title: "比Lululemon还贵的瑜伽服来中国了", link: "https://s.weibo.com/weibo?q=%E6%AF%94Lululemon%E8%BF%98%E8%B4%B5%E7%9A%84%E7%91%9C%E4%BC%BD%E6%9C%8D%E6%9D%A5%E4%B8%AD%E5%9B%BD%E4%BA%86", hot: 737202 },
-    { title: "男子分手十多年想要回30克金手镯", link: "https://s.weibo.com/weibo?q=%E7%94%B7%E5%AD%90%E5%88%86%E6%89%8B%E5%8D%81%E5%A4%9A%E5%B9%B4%E6%83%B3%E8%A6%81%E5%9B%9E30%E5%85%8B%E9%87%91%E6%89%8B%E9%95%AF", hot: 640674 },
-    { title: "魏如萱称歌手丑八怪是节目组选的", link: "https://s.weibo.com/weibo?q=%E9%AD%8F%E5%A6%82%E8%90%B1%E7%A7%B0%E6%AD%8C%E6%89%8B%E4%B8%91%E5%85%AB%E6%80%AA%E6%98%AF%E8%8A%82%E7%9B%AE%E7%BB%84%E9%80%89%E7%9A%84", hot: 622768 },
-    { title: "威少拒绝国王奇才报价仍选择退役", link: "https://s.weibo.com/weibo?q=%E5%A8%81%E5%B0%91%E6%8B%92%E7%BB%9D%E5%9B%BD%E7%8E%8B%E5%A5%87%E6%89%8D%E6%8A%A5%E4%BB%B7%E4%BB%8D%E9%80%89%E6%8B%A9%E9%80%80%E5%BD%B9", hot: 616184 },
-    { title: "上半年全国离婚登记138.3万对", link: "https://s.weibo.com/weibo?q=%E4%B8%8A%E5%8D%8A%E5%B9%B4%E5%85%A8%E5%9B%BD%E7%A6%BB%E5%A9%9A%E7%99%BB%E8%AE%B0138.3%E4%B8%87%E5%AF%B9", hot: 577980 },
-    { title: "金价油价全涨了", link: "https://s.weibo.com/weibo?q=%E9%87%91%E4%BB%B7%E6%B2%B9%E4%BB%B7%E5%85%A8%E6%B6%A8%E4%BA%86", hot: 564273 },
-    { title: "龙餐馆", link: "https://s.weibo.com/weibo?q=%E9%BE%99%E9%A4%90%E9%A6%86", hot: 557149 },
-    { title: "作家李娟10年没见妈妈了", link: "https://s.weibo.com/weibo?q=%E4%BD%9C%E5%AE%B6%E6%9D%8E%E5%A8%9F10%E5%B9%B4%E6%B2%A1%E8%A7%81%E5%A6%88%E5%A6%88%E4%BA%86", hot: 550347 },
-    { title: "麦迪娜姜潮婚礼超多新疆美食", link: "https://s.weibo.com/weibo?q=%E9%BA%A6%E8%BF%AA%E5%A8%9C%E5%A7%9C%E6%BD%AE%E5%A9%9A%E7%A4%BC%E8%B6%85%E5%A4%9A%E6%96%B0%E7%96%86%E7%BE%8E%E9%A3%9F", hot: 540143 },
+    { title: '朱镕基同志逝世', link: 'https://s.weibo.com/weibo?q=%E6%9C%B1%E9%95%95%E5%9F%BA%E5%90%8C%E5%BF%97%E9%80%9D%E4%B8%96', hot: 0 },
+    { title: '胖东来许昌老店关闭周边商户发声', link: 'https://s.weibo.com/weibo?q=%E8%83%96%E4%B8%9C%E6%9D%A5%E8%AE%B8%E6%98%8C%E8%80%81%E5%BA%97%E5%85%B3%E9%97%AD%E5%91%A8%E8%BE%B9%E5%95%86%E6%88%B7%E5%8F%91%E5%A3%B0', hot: 0 },
+    { title: '60万亿元消费蓝海要来了', link: 'https://s.weibo.com/weibo?q=60%E4%B8%87%E4%BA%BF%E5%85%83%E6%B6%88%E8%B4%B9%E8%93%9D%E6%B5%B7%E8%A6%81%E6%9D%A5%E4%BA%86', hot: 0 },
+    { title: '男子分手十多年想要回30克金手镯', link: 'https://s.weibo.com/weibo?q=%E7%94%B7%E5%AD%90%E5%88%86%E6%89%8B%E5%8D%81%E5%A4%9A%E5%B9%B4%E6%83%B3%E8%A6%81%E5%9B%9E30%E5%85%8B%E9%87%91%E6%89%8B%E9%95%AF', hot: 0 },
+    { title: '金价油价全涨了', link: 'https://s.weibo.com/weibo?q=%E9%87%91%E4%BB%B7%E6%B2%B9%E4%BB%B7%E5%85%A8%E6%B6%A8%E4%BA%86', hot: 0 },
+    { title: '魏如萱称歌手丑八怪是节目组选的', link: 'https://s.weibo.com/weibo?q=%E9%AD%8F%E5%A6%82%E8%90%B1%E7%A7%B0%E6%AD%8C%E6%89%8B%E4%B8%91%E5%85%AB%E6%80%AA%E6%98%AF%E8%8A%82%E7%9B%AE%E7%BB%84%E9%80%89%E7%9A%84', hot: 0 },
+    { title: '威少拒绝国王奇才报价仍选择退役', link: 'https://s.weibo.com/weibo?q=%E5%A8%81%E5%B0%91%E6%8B%92%E7%BB%9D%E5%9B%BD%E7%8E%8B%E5%A5%87%E6%89%8D%E6%8A%A5%E4%BB%B7%E4%BB%8D%E9%80%89%E6%8B%A9%E9%80%80%E5%BD%B9', hot: 0 },
+    { title: '流星雨', link: 'https://s.weibo.com/weibo?q=%E6%B5%81%E6%98%9F%E9%9B%A8', hot: 0 },
+    { title: '41国所谓涉华声明不过是废纸一张', link: 'https://s.weibo.com/weibo?q=41%E5%9B%BD%E6%89%80%E8%B0%93%E6%B6%89%E5%8D%8E%E5%A3%B0%E6%98%8E%E4%B8%8D%E8%BF%87%E6%98%AF%E5%BA%9F%E7%BA%B8%E4%B8%80%E5%BC%A0', hot: 0 },
+    { title: '龙餐馆', link: 'https://s.weibo.com/weibo?q=%E9%BE%99%E9%A4%90%E9%A6%86', hot: 0 },
+    { title: '比Lululemon还贵的瑜伽服来中国了', link: 'https://s.weibo.com/weibo?q=%E6%AF%94Lululemon%E8%BF%98%E8%B4%B5%E7%9A%84%E7%91%9C%E4%BC%BD%E6%9C%8D%E6%9D%A5%E4%B8%AD%E5%9B%BD%E4%BA%86', hot: 0 },
+    { title: '麦迪娜姜潮婚礼超多新疆美食', link: 'https://s.weibo.com/weibo?q=%E9%BA%A6%E8%BF%AA%E5%A8%9C%E5%A7%9C%E6%BD%AE%E5%A9%9A%E7%A4%BC%E8%B6%85%E5%A4%9A%E6%96%B0%E7%96%86%E7%BE%8E%E9%A3%9F', hot: 0 },
   ] },
-  { name: '今日要闻·财经/政务/生活', icon: '📰', items: [
-    { title: "今年上半年全国结婚登记 327.5 万对，较去年同期减少 26.4 万对；离婚登记 138.3 万对，较去年同期增加 5.2 万对", link: '', hot: 0 },
-    { title: "银行能办结婚证了：天津首家银行内结婚登记点启用，领证还能定制银行卡", link: '', hot: 0 },
-    { title: "31 省上半年财政收入出炉：广东以 7421 亿元连续 35 年蝉联榜首；西藏以 37% 同比增速领跑", link: '', hot: 0 },
-    { title: "央行：8 月 14 日、8 月 17 日至 8 月 19 日开展隔夜逆回购操作，单日不超 6000 亿元", link: '', hot: 0 },
-    { title: "中汽协：7 月新能源汽车新车销量占比首超 60%；出口连续第二个月超 100 万辆", link: '', hot: 0 },
-    { title: "我国成功攻克锂云母提锂多项重大技术难题，大幅提升锂回收率", link: '', hot: 0 },
-    { title: "我国主导的生命科学领域国际学术期刊《Vita》纸质刊首期发布", link: '', hot: 0 },
-    { title: "苏州：新就业群体台风中受伤最高可获 10000 元救助", link: '', hot: 0 },
-    { title: "福建福州一事业单位工作人员 24 年未到岗，单位登《返岗通知书》，律师称连续旷工可解除聘用", link: '', hot: 0 },
-    { title: "美国撤销联邦政府设备使用 TikTok 禁令，原因是 TikTok 美国业务重组后已不再构成威胁", link: '', hot: 0 },
-    { title: "世界气象组织：今年全球 7 月气温为有记录以来第二高，全球海洋表面平均温度则创同期最高纪录", link: '', hot: 0 },
-    { title: "澳大利亚给外卖员定最低工资：一周接单 38 小时，一年能赚 30 万元", link: '', hot: 0 },
-    { title: "NBA 洛杉矶湖人队被 125 亿美元出售，创北美职业体育球队交易纪录，新老板是特朗普女婿弟弟", link: '', hot: 0 },
-    { title: "美国 7 月 CPI 同比涨幅回落至 3.4%，市场对美联储 9 月加息预期降温", link: '', hot: 0 },
-    { title: "特朗普发文宣称：美国完全控制着霍尔木兹海峡，伊朗对此束手无策", link: '', hot: 0 },
+  { name: '知乎热榜', icon: '💡', items: [
+    { title: '中共中央 全国人大常委会 国务院 全国政协讣告 朱镕基同志逝世', link: 'https://www.zhihu.com/articles/2070933430993414087', hot: 0 },
+    { title: 'DeepSeek V4 Pro 正式版发布，如何评价该模型？', link: 'https://www.zhihu.com/question/2071014727606703118', hot: 0 },
+    { title: '据媒体报道部分手机壳疑似采用废弃针管等医疗垃圾加工而成，真的吗？对健康会有多大危害？消费者该如何辨别？', link: 'https://www.zhihu.com/question/2070066925363619123', hot: 0 },
+    { title: '货拉拉司机中途加价被拒，带货跑 600 公里外，平台介入后仍拒不归还，怎么回事？暴露出平台哪些问题？', link: 'https://www.zhihu.com/question/2070902073780953324', hot: 0 },
+    { title: '威少（维斯布鲁克）宣布退役，结束长达 18 年的 NBA 生涯，如何评价他的职业生涯？', link: 'https://www.zhihu.com/question/2071116184003646639', hot: 0 },
+    { title: '《西游记》中猪八戒和沙和尚到底是真的弱还是在摸鱼？', link: 'https://www.zhihu.com/question/592713092', hot: 0 },
+    { title: 'Deepseek V4Pro正式版发布，相比Claude Fable 5等模型，性能如何？性价比高吗？', link: 'https://www.zhihu.com/question/2071019389479023642', hot: 0 },
+    { title: '山西一医院实习护士晒患者隐私照，院方称将严肃处理，具体怎么回事？为什么这类事时有发生，问题出在哪？', link: 'https://www.zhihu.com/question/2070271590869070734', hot: 0 },
+    { title: '7 月小米 SU7 销量 21,044 辆，连续 4 个月位列 20 万以上轿车销量第一，如何评价？', link: 'https://www.zhihu.com/question/2070807325699580723', hot: 0 },
+    { title: '星球的公转和自转速度那么快，为什么没有被摇匀？', link: 'https://www.zhihu.com/question/1984892437014009024', hot: 0 },
+    { title: '为什么《蜘蛛侠》能拍「交不起房租」，国产大片却总在拍「光鲜亮丽的拯救世界」？', link: 'https://www.zhihu.com/question/2068356359494559541', hot: 0 },
+    { title: '2026 LPL 第三赛段 BLG 1-2 JDG，如何评价这场比赛？Flandre 的表现如何？', link: 'https://www.zhihu.com/question/2070968228314965072', hot: 0 },
+  ] },
+  { name: '今日要闻', icon: '📰', items: [
+    { title: '今年上半年全国结婚登记 327.5 万对，较去年同期减少 26.4 万对；离婚登记 138.3 万对，较去年同期增加 5.2 万对', link: '', hot: 0 },
+    { title: '银行能办结婚证了：天津首家银行内结婚登记点启用，领证还能定制银行卡', link: '', hot: 0 },
+    { title: '31 省上半年财政收入出炉：广东以 7421 亿元连续 35 年蝉联榜首；西藏以 37% 同比增速领跑', link: '', hot: 0 },
+    { title: '央行：8 月 14 日、8 月 17 日至 8 月 19 日开展隔夜逆回购操作，单日不超 6000 亿元', link: '', hot: 0 },
+    { title: '中汽协：7 月新能源汽车新车销量占比首超 60%；出口连续第二个月超 100 万辆', link: '', hot: 0 },
+    { title: '我国成功攻克锂云母提锂多项重大技术难题，大幅提升锂回收率', link: '', hot: 0 },
+    { title: '我国主导的生命科学领域国际学术期刊《Vita》纸质刊首期发布', link: '', hot: 0 },
+    { title: '苏州：新就业群体台风中受伤最高可获 10000 元救助', link: '', hot: 0 },
+    { title: '福建福州一事业单位工作人员 24 年未到岗，单位登《返岗通知书》，律师称连续旷工可解除聘用', link: '', hot: 0 },
+    { title: '美国撤销联邦政府设备使用 TikTok 禁令，原因是 TikTok 美国业务重组后已不再构成威胁', link: '', hot: 0 },
+    { title: '世界气象组织：今年全球 7 月气温为有记录以来第二高，全球海洋表面平均温度则创同期最高纪录', link: '', hot: 0 },
+    { title: '澳大利亚给外卖员定最低工资：一周接单 38 小时，一年能赚 30 万元', link: '', hot: 0 },
+    { title: 'NBA 洛杉矶湖人队被 125 亿美元出售，创北美职业体育球队交易纪录，新老板是特朗普女婿弟弟', link: '', hot: 0 },
+    { title: '美国 7 月 CPI 同比涨幅回落至 3.4%，市场对美联储 9 月加息预期降温', link: '', hot: 0 },
+    { title: '特朗普发文宣称：美国完全控制着霍尔木兹海峡，伊朗对此束手无策', link: '', hot: 0 },
+  ] },
+  { name: '财经专属榜', icon: '💰', items: [
+    { title: '银行能办结婚证了：天津首家银行内结婚登记点启用，领证还能定制银行卡', link: '', hot: 0 },
+    { title: '31 省上半年财政收入出炉：广东以 7421 亿元连续 35 年蝉联榜首；西藏以 37% 同比增速领跑', link: '', hot: 0 },
+    { title: '央行：8 月 14 日、8 月 17 日至 8 月 19 日开展隔夜逆回购操作，单日不超 6000 亿元', link: '', hot: 0 },
+    { title: '中汽协：7 月新能源汽车新车销量占比首超 60%；出口连续第二个月超 100 万辆', link: '', hot: 0 },
+    { title: '我国成功攻克锂云母提锂多项重大技术难题，大幅提升锂回收率', link: '', hot: 0 },
+    { title: '苏州：新就业群体台风中受伤最高可获 10000 元救助', link: '', hot: 0 },
+    { title: '澳大利亚给外卖员定最低工资：一周接单 38 小时，一年能赚 30 万元', link: '', hot: 0 },
   ] },
 ] };
 
@@ -215,7 +238,7 @@ function renderNews(el, search) {
         <div class="card-title" style="margin-bottom:0">📰 当日火热话题</div>
         <button class="btn btn-secondary btn-sm" id="newsRefresh">🔄 刷新</button>
       </div>
-      <div id="newsUpdated" style="font-size:11px;color:var(--text-muted);margin-bottom:8px">数据来源：60s 实时热榜（抖音 / 微博 / 今日要闻）</div>
+      <div id="newsUpdated" style="font-size:11px;color:var(--text-muted);margin-bottom:8px">数据来源：60s 实时热榜（抖音 / 微博 / 知乎 / 今日要闻 + 财经专属榜）</div>
       <input class="form-input" id="growthSearch" placeholder="🔍 搜索话题" value="${escapeHtml(search || '')}">
     </div>
     <div id="newsBody"><div class="empty-state"><div class="empty-state-text">加载中…</div></div></div>
@@ -227,28 +250,47 @@ function renderNews(el, search) {
   else loadNews(el, search || '');
 }
 
+const FIN_KW = ['财经','央行','财政','税收','税','股市','基金','GDP','收入','房价','通胀','汇率','新能源','锂','黄金','银行','证券','保险','消费','外贸','进出口','人民币','贷款','降息','逆回购','经济','股票','理财','债券','期货','油价','物价','就业','工资','养老金','医保','公积金','降准','融资','上市','营收','净利润','财报','券商','A股','港股','美股','房贷','存款'];
+function parseZhihuHot(desc) {
+  if (!desc) return 0;
+  const m = desc.match(/([\d.]+)\s*万/);
+  if (m) return Math.round(parseFloat(m[1]) * 10000);
+  const m2 = desc.match(/(\d+)/);
+  return m2 ? parseInt(m2[1], 10) : 0;
+}
+
 function loadNews(el, search) {
   const body = document.getElementById('newsBody');
   if (body) body.innerHTML = '<div class="empty-state"><div class="empty-state-text">加载中…</div></div>';
   const sources = [
     { key: 'douyin', name: '抖音热议', icon: '🔥', url: 'https://60s.viki.moe/v2/douyin' },
     { key: 'weibo', name: '微博热搜', icon: '🔥', url: 'https://60s.viki.moe/v2/weibo' },
-    { key: 'news', name: '今日要闻·财经/政务/生活', icon: '📰', url: 'https://60s.viki.moe/v2/60s' }
+    { key: 'zhihu', name: '知乎热榜', icon: '💡', url: 'https://60s.viki.moe/v2/zhihu' },
+    { key: 'news', name: '今日要闻', icon: '📰', url: 'https://60s.viki.moe/v2/60s' }
   ];
   Promise.all(sources.map(s => fetch(s.url).then(r => r.ok ? r.json() : Promise.reject(new Error(s.name))).then(d => ({ s, d })).catch(e => ({ s, err: e }))))
     .then(results => {
-      const sections = []; let date = '';
+      const sections = []; let date = ''; let newsItems = [];
       results.forEach(({ s, d, err }) => {
         if (err || !d) return;
         if (s.key === 'news') {
           const arr = (d.data && d.data.news) || [];
           if (d.data && d.data.date) date = d.data.date;
-          sections.push({ name: s.name, icon: s.icon, items: arr.map(t => ({ title: (typeof t === 'string' ? t : t.title) || '', link: '', hot: 0 })).filter(it => it.title) });
+          newsItems = arr.map(t => ({ title: (typeof t === 'string' ? t : t.title) || '', link: '', hot: 0 })).filter(it => it.title);
+          if (newsItems.length) sections.push({ name: s.name, icon: s.icon, items: newsItems });
+        } else if (s.key === 'zhihu') {
+          const arr = d.data || [];
+          const items = arr.slice(0, 15).map(t => ({ title: t.title || '', link: t.link || '', hot: parseZhihuHot(t.hot_value_desc) })).filter(it => it.title);
+          if (items.length) sections.push({ name: s.name, icon: s.icon, items });
         } else {
           const arr = (d.data) || [];
-          sections.push({ name: s.name, icon: s.icon, items: arr.slice(0, 15).map(t => ({ title: t.title || '', link: t.link || '', hot: t.hot_value || 0 })).filter(it => it.title) });
+          const items = arr.slice(0, 15).map(t => ({ title: t.title || '', link: t.link || '', hot: t.hot_value || 0 })).filter(it => it.title);
+          if (items.length) sections.push({ name: s.name, icon: s.icon, items });
         }
       });
+      // 财经专属榜：从「今日要闻」按财经关键词筛选
+      const fin = newsItems.filter(it => FIN_KW.some(k => it.title.indexOf(k) >= 0));
+      if (fin.length) sections.push({ name: '财经专属榜', icon: '💰', items: fin });
       if (!sections.length) throw new Error('empty');
       newsCache = { date, sections };
       renderNewsBody(el, search || '');
