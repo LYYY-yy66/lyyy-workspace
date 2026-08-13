@@ -1174,3 +1174,100 @@ body {
 }
 .emoji-cell:hover { background: var(--bg); }
 .emoji-cell.selected { background: var(--primary); box-shadow: 0 2px 6px rgba(124,156,191,0.3); }
+
+/* ===== 喝水打卡 ===== */
+.water-ring-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.water-ring { width: 120px; height: 120px; flex: 0 0 120px; }
+.water-stats { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.water-stat { display: flex; flex-direction: column; }
+.ws-num { font-size: 22px; font-weight: 700; color: var(--primary); }
+.ws-label { font-size: 12px; color: var(--text-muted); }
+.water-bar { height: 10px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.water-bar-fill { height: 100%; background: linear-gradient(90deg, #7c9cbf, #5b9bd5); border-radius: 6px; transition: width 0.4s; }
+.water-cups { display: flex; gap: 8px; margin-top: 14px; }
+.water-cup { flex: 1; padding: 10px 4px; border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); background: #fff; font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.water-cup:hover { border-color: var(--primary); color: var(--primary); background: rgba(124,156,191,0.08); }
+.water-log-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--bg); }
+.water-log-del { border: none; background: none; color: var(--danger); cursor: pointer; font-size: 12px; }
+
+/* ===== 饮食热量 ===== */
+.cal-summary { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+.cal-big { display: flex; flex-direction: column; align-items: center; }
+.cal-num { font-size: 34px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.cal-unit { font-size: 12px; color: var(--text-muted); }
+.cal-macros { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.cal-macro { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); }
+.cal-macro b { color: var(--text-primary); }
+.cal-bar { height: 8px; background: var(--bg); border-radius: 5px; overflow: hidden; }
+.cal-bar-fill { height: 100%; background: #e8746b; border-radius: 5px; transition: width 0.4s; }
+.meal-photo { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; margin-right: 10px; flex: 0 0 52px; }
+.meal-type-pick { padding: 7px 10px; border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); background: #fff; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.meal-type-pick.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.food-db-item { padding: 8px 10px; font-size: 13px; border-radius: var(--radius-sm); cursor: pointer; }
+.food-db-item:hover { background: var(--bg); }
+
+/* ===== 养生7天计划 ===== */
+.qi-week { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.qi-day { flex: 0 0 158px; border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 10px; background: #fff; }
+.qi-day.weekend { background: #fdf6ec; border-color: #f3e0c0; }
+.qi-day.today { border-color: var(--primary); box-shadow: 0 2px 8px rgba(124,156,191,0.25); }
+.qi-day-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-weight: 600; }
+.qi-day-name { font-size: 14px; }
+.qi-day-date { font-size: 11px; color: var(--text-muted); }
+.qi-day-tag { margin-left: auto; font-size: 10px; background: #f3e0c0; color: #a9712b; padding: 1px 6px; border-radius: 8px; }
+
+/* ===== 开关 switch ===== */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background: #cfd8e3; border-radius: 24px; transition: 0.25s; }
+.slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.25s; }
+.switch input:checked + .slider { background: var(--primary); }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+
+/* ===== 个人提升 ===== */
+.growth-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.growth-card { border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 12px 14px; background: #fff; }
+.growth-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.growth-card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1.4; }
+.growth-fav { border: none; background: none; font-size: 18px; color: var(--text-muted); cursor: pointer; line-height: 1; }
+.growth-fav.active { color: #f1c40f; }
+.growth-card-method { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; }
+.growth-card-case { font-size: 13px; color: var(--text-primary); line-height: 1.6; background: var(--bg); padding: 8px 10px; border-radius: var(--radius-sm); }
+
+/* ===== 穿搭助手 ===== */
+.outfit-weather { margin-bottom: 12px; }
+.ow-card { display: flex; align-items: center; gap: 10px; background: linear-gradient(90deg, rgba(124,156,191,0.12), rgba(91,155,213,0.12)); border-radius: var(--radius-sm); padding: 10px 14px; }
+.ow-temp { font-size: 22px; font-weight: 800; color: var(--primary); }
+.ow-cond { font-size: 14px; color: var(--text-secondary); }
+.ow-loc { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+.ow-refresh { border: 1px solid var(--border, #e3e9f0); background: #fff; border-radius: 14px; padding: 3px 12px; font-size: 12px; color: var(--primary); cursor: pointer; }
+.closet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.closet-item { border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); overflow: hidden; background: #fff; }
+.closet-item.idle { opacity: 0.5; }
+.closet-item.often { border-color: var(--primary); }
+.closet-img { width: 100%; height: 120px; object-fit: cover; display: block; }
+.closet-img-empty { display: flex; align-items: center; justify-content: center; font-size: 40px; background: var(--bg); height: 120px; }
+.closet-meta { padding: 8px 10px; }
+.closet-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.closet-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.closet-tags span { font-size: 11px; background: var(--bg); color: var(--text-secondary); padding: 1px 6px; border-radius: 6px; }
+.closet-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.closet-tag-btn { font-size: 11px; padding: 3px 8px; border: 1px solid var(--border, #e3e9f0); background: #fff; border-radius: 10px; color: var(--text-secondary); cursor: pointer; }
+.closet-tag-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.closet-tag-btn.del { color: var(--danger); }
+.today-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.today-pick-item { display: flex; align-items: center; gap: 6px; font-size: 12px; border: 1px solid var(--border, #e3e9f0); border-radius: 14px; padding: 4px 10px; cursor: pointer; background: #fff; }
+.today-pick-item input { display: none; }
+.tp-thumb { width: 26px; height: 26px; object-fit: cover; border-radius: 5px; }
+.ai-result-card { border-color: rgba(124,156,191,0.4); }
+.cheer { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--primary); text-align: center; }
+.outfit-plan { border: 1px solid var(--border, #e3e9f0); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; background: #fff; }
+.op-head { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.op-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.op-item { font-size: 12px; background: rgba(124,156,191,0.12); color: var(--primary); padding: 3px 10px; border-radius: 12px; }
+.op-tip { font-size: 12px; color: var(--text-muted); }
+.chat-box { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.chat-empty { font-size: 12px; color: var(--text-muted); padding: 10px; text-align: center; }
+.chat-msg { font-size: 13px; line-height: 1.6; padding: 8px 12px; border-radius: 12px; max-width: 88%; }
+.chat-msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
+.chat-msg.ai { align-self: flex-start; background: var(--bg); color: var(--text-primary); border-bottom-left-radius: 2px; }

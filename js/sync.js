@@ -56,6 +56,44 @@ function schedulePush() {
 // ========== 上传（防抖触发） ==========
 async function pushAll() {
   if (!enabled || !token) return;
+  const data = collectLocalData();
+  const body = { rev: seenRev + 1, data, meta: keyTimes };
+  try {
+    const res = await fetch('https://api.github.com/gists/' + gistId, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify(body) } } })
+    });
+    if (res.status === 404) { await createGist(body); }
+    else if (!res.ok) { setIndicator('error', '同步失败'); showSyncToast('同步失败（HTTP ' + res.status + '）'); }
+    else { seenRev = body.rev; saveMeta(); setIndicator('synced', '已同步'); }
+  } catch (e) {
+    setIndicator('error', '同步失败');
+  }
+}
+
+async function createGist(body) {
+  const res = await fetch('https://api.github.com/gists', {
+    method: 'POST',
+    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ public: false, files: { [GIST_FILE]: { content: JSON.stringify(body) } } })
+  });
+  if (!res.ok) {
+    setIndicator('error', '创建失败');
+    showSyncToast('创建云端空间失败（HTTP ' + res.status + '）');
+    throw new Error('create gist failed');
+  }
+  const gist = await res.json();
+  gistId = gist.id;
+  Store.set('syncGistId', gistId);
+  seenRev = body.rev;
+  saveMeta();
+  setIndicator('synced', '已同步');
+  return gistId;
+}
+
+// 收集本机所有 lyyy_ 开头的数据
+function collectLocalData() {
   const data = {};
   for (let i = 0; i < localStorage.length; i++) {
     const full = localStorage.key(i);
@@ -65,38 +103,7 @@ async function pushAll() {
       catch { data[k] = localStorage.getItem(full); }
     }
   }
-  const body = { rev: seenRev + 1, data, meta: keyTimes };
-  try {
-    const res = await fetch('https://api.github.com/gists/' + gistId, {
-      method: 'PATCH',
-      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify(body) } } })
-    });
-    if (res.status === 404) { await createGist(body); }
-    else if (!res.ok) { setIndicator('error', '同步失败'); }
-    else { seenRev = body.rev; saveMeta(); setIndicator('synced', '已同步'); }
-  } catch (e) {
-    setIndicator('error', '同步失败');
-  }
-}
-
-async function createGist(body) {
-  try {
-    const res = await fetch('https://api.github.com/gists', {
-      method: 'POST',
-      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ public: false, files: { [GIST_FILE]: { content: JSON.stringify(body) } } })
-    });
-    if (!res.ok) { setIndicator('error', '创建失败'); return; }
-    const gist = await res.json();
-    gistId = gist.id;
-    Store.set('syncGistId', gistId);
-    seenRev = body.rev;
-    saveMeta();
-    setIndicator('synced', '已同步');
-  } catch (e) {
-    setIndicator('error', '创建失败');
-  }
+  return data;
 }
 
 // ========== 拉取 ==========
@@ -170,38 +177,68 @@ function openSyncSettings(onPulled) {
   const cur = enabled ? '已连接 · 数据将自动在设备间同步' : '未连接 · 数据仅存于本机这个浏览器';
   content.innerHTML = `
     <div class="modal-title">☁️ 跨设备同步设置</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">${cur}。<br>想让电脑和手机看到同一份数据，需要一个 <b>GitHub Gist 权限的 Token</b> 作云端中转（纯静态站没有后端，这是最轻的方案，Token 只存在你本机）。</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">${cur}。<br>用 <b>GitHub Gist</b> 作云端中转（纯静态站没有后端，这是最轻的方案），Token 只存在你本机。</div>
     <div style="font-size:12px;background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;line-height:1.7">
-      <b>① 获取 Token</b>：打开 <span style="word-break:break-all">github.com/settings/tokens</span>，新建 token，权限只勾 <b>Gist: Read and write</b>。<br>
-      <b>② 填进来</b>：把 token 粘到下面，Gist ID 留空会自动建一个。<br>
-      <b>③ 两端同款</b>：电脑和手机都填<b>同一个 token + 同一个 Gist</b>，数据就互通了。
+      <b>① 获取 Token</b>：<span style="word-break:break-all">github.com/settings/tokens</span>，权限只勾 <b>Gist: Read and write</b>。<br>
+      <b>② 填进来</b>：粘 token，Gist ID 留空会自动建一个云空间。<br>
+      <b>③ 两端同款</b>：电脑和手机必须填<b>同一个 Token + 同一个 Gist ID</b> 才会同步同一份；各填各的空 = 两份各存各的，对不上。
     </div>
     <div class="form-group"><label class="form-label">GitHub Token（gist 权限）</label><input class="form-input" id="syncToken" type="password" placeholder="github_pat_..." value="${token}"></div>
     <div class="form-group"><label class="form-label">Gist ID（留空则自动创建）</label><input class="form-input" id="syncGist" placeholder="可选，留空自动新建" value="${gistId}"></div>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-primary btn-sm" id="syncSave" style="flex:1">保存并连接</button>
+      <button class="btn btn-primary btn-sm" id="syncSave" style="flex:2">保存并连接</button>
       <button class="btn btn-secondary btn-sm" id="syncNow" style="flex:1">立即同步</button>
       <button class="btn btn-secondary btn-sm" id="syncDisconnect" style="flex:1">断开</button>
     </div>
+    <div id="syncStatusArea"></div>
     <div style="font-size:11px;color:var(--text-muted);margin-top:12px">说明：同步按数据项的时间戳合并，正常交替使用不会丢数据；若两设备同时离线各改各的，同一项的后改覆盖先改。这是一个<b>独立的短效 token</b>，和推代码用的不是同一个，用完可在上面的页面撤销。</div>
   `;
   modal.style.display = 'flex';
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-  document.getElementById('syncSave').addEventListener('click', () => {
+
+  function refreshStatus() {
+    const area = document.getElementById('syncStatusArea');
+    if (!area) return;
+    if (enabled && gistId) {
+      area.innerHTML = `<div style="margin-top:14px;padding:10px 12px;border:1px dashed var(--primary-light);border-radius:var(--radius-sm);background:rgba(124,156,191,0.06)">
+        <div style="font-size:13px;color:var(--success);font-weight:600;margin-bottom:6px">✅ 已连接，云端空间已就绪</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px">Gist ID：<code style="background:var(--bg);padding:2px 6px;border-radius:4px;word-break:break-all">${gistId}</code></div>
+        <button class="btn btn-secondary btn-sm" id="syncCopyId" style="width:100%">📋 复制 Gist ID（填到另一台设备）</button>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px">把上面这个 Gist ID 也填到另一台设备的同步设置里（同样的 Token），两台就同步同一份数据了。</div>
+      </div>`;
+      const cp = document.getElementById('syncCopyId');
+      if (cp) cp.addEventListener('click', () => { copyText(gistId); showSyncToast('已复制 Gist ID'); });
+    } else {
+      area.innerHTML = '';
+    }
+  }
+
+  document.getElementById('syncSave').addEventListener('click', async () => {
     token = document.getElementById('syncToken').value.trim();
     gistId = document.getElementById('syncGist').value.trim();
     if (!token) { showSyncToast('请填写 Token'); return; }
     Store.set('syncToken', token);
-    if (gistId) Store.set('syncGistId', gistId);
     enabled = true;
-    modal.style.display = 'none';
     setIndicator('syncing', '同步中…');
-    pullAll(onPulled).then(() => pushAll());
+    try {
+      if (!gistId) {
+        const body = { rev: seenRev + 1, data: collectLocalData(), meta: keyTimes };
+        await createGist(body);
+        showSyncToast('已新建云端空间，去复制 Gist ID 给另一台设备');
+      } else {
+        Store.set('syncGistId', gistId);
+      }
+      await pullAll(onPulled);
+      await pushAll();
+      refreshStatus();
+    } catch (e) {
+      refreshStatus();
+    }
   });
   document.getElementById('syncNow').addEventListener('click', () => {
     if (!enabled) { showSyncToast('请先保存并连接'); return; }
     setIndicator('syncing', '同步中…');
-    pullAll(onPulled).then(() => pushAll());
+    pullAll(onPulled).then(() => pushAll()).then(refreshStatus);
   });
   document.getElementById('syncDisconnect').addEventListener('click', () => {
     enabled = false;
@@ -212,6 +249,19 @@ function openSyncSettings(onPulled) {
     setIndicator('local', '本地');
     showSyncToast('已断开，数据仅存本机');
   });
+  refreshStatus();
+}
+
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).catch(() => fallbackCopy(t));
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t) {
+  const ta = document.createElement('textarea');
+  ta.value = t; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  ta.remove();
 }
 
 function showSyncToast(msg) {

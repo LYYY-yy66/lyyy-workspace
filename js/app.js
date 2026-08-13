@@ -8,8 +8,10 @@ import { HealthPage } from './pages/health.js';
 import { EnglishPage } from './pages/english.js';
 import { TaxPage } from './pages/tax.js';
 import { FinancePage } from './pages/finance.js';
+import { GrowthPage } from './pages/growth.js';
+import { OutfitPage } from './pages/outfit.js';
 
-const pages = { todo: TodoPage, health: HealthPage, english: EnglishPage, tax: TaxPage, finance: FinancePage };
+const pages = { todo: TodoPage, health: HealthPage, english: EnglishPage, tax: TaxPage, finance: FinancePage, growth: GrowthPage, outfit: OutfitPage };
 let currentPage = 'todo';
 
 // ========== 初始化 ==========

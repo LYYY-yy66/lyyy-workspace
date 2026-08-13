@@ -9,6 +9,7 @@ let exerciseTab = 'checkin'; // checkin | video
 let selectedDate = Store.today();
 let weightView = 'month';
 let weightYear, weightMonth;
+let dietTab = 'water'; // water | calorie
 
 export const HealthPage = {
   render(container) {
@@ -132,46 +133,172 @@ function renderWeight(el) {
 
 // ========== 模块2: 饮食管理 ==========
 function renderDiet(el) {
-  const meals = Store.get('meals', []);
-  const waterRecords = Store.get('waterRecords', []);
-  const todayMeals = meals.filter(m => m.date === selectedDate);
-  const todayWater = waterRecords.filter(w => w.date === selectedDate);
-  const waterGoal = Store.get('waterGoal', 2000);
-  const totalWater = todayWater.reduce((s, w) => s + w.amount, 0);
-  const goals = Store.get('nutritionGoals', { calories: 2000, carbs: 250, protein: 75, fat: 65 });
-  let totalCal = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
-  todayMeals.forEach(m => { totalCal += m.calories||0; totalCarbs += m.carbs||0; totalProtein += m.protein||0; totalFat += m.fat||0; });
-  const remainCal = Math.max(0, goals.calories - totalCal);
-  const dateItems = [];
-  for (let i = -3; i <= 3; i++) { const d = new Date(); d.setDate(d.getDate() + i); dateItems.push(d); }
+  el.innerHTML = `
+    <div class="sub-tabs">
+      <button class="sub-tab ${dietTab==='water'?'active':''}" data-diet="water">💧 喝水打卡</button>
+      <button class="sub-tab ${dietTab==='calorie'?'active':''}" data-diet="calorie">🔥 饮食热量</button>
+    </div>
+    <div id="dietContent"></div>
+  `;
+  el.querySelectorAll('.sub-tab[data-diet]').forEach(t => t.addEventListener('click', () => { dietTab = t.dataset.diet; renderDiet(el); }));
+  const content = document.getElementById('dietContent');
+  if (dietTab === 'water') renderWater(content);
+  else renderCalorie(content);
+}
+
+// ========== 饮食·喝水打卡 ==========
+function renderWater(el) {
+  const goal = Store.get('waterGoal', 1500);
+  const records = Store.get('waterRecords', []);
+  const today = Store.today();
+  const todayRecs = records.filter(r => r.date === today);
+  const total = todayRecs.reduce((s, r) => s + r.amount, 0);
+  const remain = Math.max(0, goal - total);
+  const pct = goal > 0 ? Math.min(100, Math.round(total / goal * 100)) : 0;
+  const C = 2 * Math.PI * 52; // 环形周长
+  const offset = C * (1 - Math.min(1, total / goal));
+  const days = [];
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const ds = formatDate(d); const sum = records.filter(r => r.date === ds).reduce((s, r) => s + r.amount, 0); days.push({ ds, sum, label: (d.getMonth() + 1) + '/' + d.getDate(), isToday: ds === today }); }
+  const reminder = Store.get('waterReminder', { enabled: false, interval: 60 });
 
   el.innerHTML = `
-    <div class="date-picker-h" id="dietDatePicker">
-      ${dateItems.map(d => { const ds = formatDate(d); const isToday = ds === Store.today(); return `<div class="date-picker-item ${isToday?'today':''} ${ds===selectedDate?'selected':''}" data-date="${ds}"><div class="dp-weekday">${['日','一','二','三','四','五','六'][d.getDay()]}</div><div class="dp-day">${d.getDate()}</div></div>`; }).join('')}
-    </div>
     <div class="card">
-      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>营养总览</div>
-      <div class="nutrition-overview">
-        <div class="nutrition-ring"><canvas id="calorieRing" width="100" height="100"></canvas></div>
-        <div class="nutrition-bars">
-          <div class="nutrition-bar-item"><div class="nutrition-bar-label"><span>碳水化合物</span><span>${totalCarbs}/${goals.carbs}g</span></div><div class="nutrition-bar"><div class="nutrition-bar-fill bar-carbs" style="width:${Math.min(100,totalCarbs/goals.carbs*100)}%"></div></div></div>
-          <div class="nutrition-bar-item"><div class="nutrition-bar-label"><span>蛋白质</span><span>${totalProtein}/${goals.protein}g</span></div><div class="nutrition-bar"><div class="nutrition-bar-fill bar-protein" style="width:${Math.min(100,totalProtein/goals.protein*100)}%"></div></div></div>
-          <div class="nutrition-bar-item"><div class="nutrition-bar-label"><span>脂肪</span><span>${totalFat}/${goals.fat}g</span></div><div class="nutrition-bar"><div class="nutrition-bar-fill bar-fat" style="width:${Math.min(100,totalFat/goals.fat*100)}%"></div></div></div>
+      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">💧 今日喝水</div>
+        <button class="action-btn" id="editWaterGoal" title="设定目标"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+      <div class="water-ring-wrap">
+        <svg class="water-ring" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg)" stroke-width="11"/>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${offset}" transform="rotate(-90 60 60)"/>
+          <text x="60" y="54" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text-primary)">${total}</text>
+          <text x="60" y="74" text-anchor="middle" font-size="11" fill="var(--text-muted)">/ ${goal} ml</text>
+        </svg>
+        <div class="water-stats">
+          <div class="water-stat"><span class="ws-num">${pct}%</span><span class="ws-label">完成度</span></div>
+          <div class="water-stat"><span class="ws-num" style="color:var(--danger)">${remain}</span><span class="ws-label">还需喝(ml)</span></div>
         </div>
       </div>
-      <div class="quick-actions">
-        ${[{n:'早餐',i:'🌅'},{n:'午餐',i:'☀️'},{n:'晚餐',i:'🌙'},{n:'加餐',i:'🍎'},{n:'运动',i:'🏃'}].map(x => `<button class="quick-action-btn" data-meal="${x.n}"><div class="quick-action-icon">${x.i}</div><span>+ ${x.n}</span></button>`).join('')}
+      <div class="water-bar"><div class="water-bar-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:6px">目标 ${goal}ml · 已喝 ${total}ml</div>
+      <div class="water-cups">
+        <button class="water-cup" data-amt="200">🥛 200</button>
+        <button class="water-cup" data-amt="300">🥤 300</button>
+        <button class="water-cup" data-amt="500">🍶 500</button>
+      </div>
+      <div class="flex-between" style="gap:8px;margin-top:8px">
+        <input class="form-input" id="customWater" type="number" placeholder="手动输入毫升" style="flex:1">
+        <button class="btn btn-primary btn-sm" id="addCustomWater" style="flex:0 0 auto">记录</button>
+      </div>
+      <div style="margin-top:10px">
+        ${todayRecs.length === 0 ? '<div style="font-size:12px;color:var(--text-muted);text-align:center">今天还没喝水记录～</div>' : todayRecs.slice().reverse().map(r => `<div class="water-log-item"><span>💧 +${r.amount}ml</span><span style="color:var(--text-muted)">${new Date(r.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}<button class="water-log-del" data-id="${r.id}" style="border:none;background:none;color:var(--danger);margin-left:6px;cursor:pointer">✕</button></span></div>`).join('')}
       </div>
     </div>
     <div class="card">
-      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>喝水记录</div></div>
-      <div class="water-tracker"><div class="water-progress"><div class="water-progress-fill" style="width:${Math.min(100,totalWater/waterGoal*100)}%"></div></div><div class="water-amount">${totalWater}/${waterGoal}ml</div><button class="water-add-btn" id="addWaterBtn">+</button></div>
+      <div class="card-title">📈 最近 7 天喝水趋势</div>
+      <canvas id="waterTrend" height="150"></canvas>
     </div>
     <div class="card">
-      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>今日记录</div>
-      ${todayMeals.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🍽️</div><div class="empty-state-text">暂无饮食记录</div></div>' : ''}
+      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">⏰ 定时喝水提醒</div>
+        <label class="switch"><input type="checkbox" id="reminderOn" ${reminder.enabled?'checked':''}><span class="slider"></span></label>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;color:var(--text-secondary)">每</span>
+        <input class="form-input" id="reminderInterval" type="number" value="${reminder.interval}" style="width:70px;flex:0 0 70px">
+        <span style="font-size:13px;color:var(--text-secondary)">分钟提醒一次（页面打开时生效）</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px">提示：静态站点无法后台常驻，提醒仅在页面打开期间生效；若允许通知，会额外弹出系统提醒。</div>
+    </div>
+  `;
+
+  drawWaterTrend(days);
+  document.getElementById('editWaterGoal').addEventListener('click', () => {
+    const modal = document.getElementById('genericModal'); const c = document.getElementById('genericModalContent');
+    c.innerHTML = `<div class="modal-title">设定每日喝水目标</div><div class="form-group"><label class="form-label">目标(ml)</label><input class="form-input" id="wgInput" type="number" value="${goal}"></div><div class="modal-actions"><button class="btn btn-secondary" id="wgCancel">取消</button><button class="btn btn-primary" id="wgSave">保存</button></div>`;
+    modal.style.display = 'flex';
+    document.getElementById('wgCancel').addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    document.getElementById('wgSave').addEventListener('click', () => { Store.set('waterGoal', Math.max(1, parseInt(document.getElementById('wgInput').value) || 1500)); modal.style.display = 'none'; renderWater(el); });
+  });
+  el.querySelectorAll('.water-cup').forEach(b => b.addEventListener('click', () => addWater(parseInt(b.dataset.amt), el)));
+  document.getElementById('addCustomWater').addEventListener('click', () => { const v = parseInt(document.getElementById('customWater').value); if (v > 0) addWater(v, el); });
+  el.querySelectorAll('.water-log-del').forEach(b => b.addEventListener('click', () => { let arr = Store.get('waterRecords', []); arr = arr.filter(x => x.id !== b.dataset.id); Store.set('waterRecords', arr); renderWater(el); }));
+  const ro = document.getElementById('reminderOn'), ri = document.getElementById('reminderInterval');
+  ro.addEventListener('change', () => setWaterReminder(ro.checked, parseInt(ri.value) || 60));
+  ri.addEventListener('change', () => setWaterReminder(ro.checked, parseInt(ri.value) || 60));
+}
+
+function addWater(amount, el) {
+  const w = Store.get('waterRecords', []);
+  w.push({ id: Store.uid(), amount, date: Store.today(), timestamp: Date.now() });
+  Store.set('waterRecords', w);
+  renderWater(el);
+}
+
+function setWaterReminder(enabled, interval) {
+  Store.set('waterReminder', { enabled, interval: Math.max(5, interval || 60) });
+  if (window.__waterTimer) { clearInterval(window.__waterTimer); window.__waterTimer = null; }
+  if (enabled) {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) {} }
+    window.__waterTimer = setInterval(() => {
+      showToast('💧 该喝水啦～ 起身接杯水');
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') { try { new Notification('喝水提醒', { body: '该喝水啦，补充 ' + (Store.get('waterGoal', 1500)) + 'ml/天' }); } catch (e) {} }
+    }, Math.max(5, interval) * 60 * 1000);
+    showToast('已开启定时喝水提醒 ⏰');
+  } else {
+    showToast('已关闭喝水提醒');
+  }
+}
+
+function drawWaterTrend(days) {
+  const canvas = document.getElementById('waterTrend'); if (!canvas || typeof Chart === 'undefined') return;
+  if (window.__waterChart) window.__waterChart.destroy();
+  const ctx = canvas.getContext('2d');
+  window.__waterChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: days.map(d => d.label), datasets: [{ label: '喝水量(ml)', data: days.map(d => d.sum), fill: true, backgroundColor: 'rgba(124,156,191,0.15)', borderColor: '#7c9cbf', tension: 0.35, pointBackgroundColor: days.map(d => d.isToday ? '#e8746b' : '#7c9cbf'), pointRadius: days.map(d => d.isToday ? 5 : 3) }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }, maintainAspectRatio: false }
+  });
+}
+
+// ========== 饮食·热量记录 ==========
+function renderCalorie(el) {
+  const meals = Store.get('meals', []);
+  const today = Store.today();
+  const todayMeals = meals.filter(m => m.date === today);
+  const goals = Store.get('nutritionGoals', { calories: 2000, carbs: 250, protein: 75, fat: 65 });
+  let totalCal = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
+  todayMeals.forEach(m => { totalCal += m.calories || 0; totalCarbs += m.carbs || 0; totalProtein += m.protein || 0; totalFat += m.fat || 0; });
+  const remainCal = Math.max(0, goals.calories - totalCal);
+  const macroKcal = { protein: totalProtein * 4, carbs: totalCarbs * 4, fat: totalFat * 9 };
+  const macroSum = macroKcal.protein + macroKcal.carbs + macroKcal.fat;
+  const types = ['早餐', '午餐', '晚餐', '加餐'];
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="flex-between mb-8"><div class="card-title" style="margin-bottom:0">🔥 今日摄入总览</div>
+        <button class="btn btn-primary btn-sm" id="photoMealBtn">📷 拍照/上传</button>
+      </div>
+      <div class="cal-summary">
+        <div class="cal-big"><span class="cal-num">${totalCal}</span><span class="cal-unit">kcal</span></div>
+        <div class="cal-macros">
+          <div class="cal-macro"><span>蛋白质</span><b>${totalProtein}g</b></div>
+          <div class="cal-macro"><span>碳水</span><b>${totalCarbs}g</b></div>
+          <div class="cal-macro"><span>脂肪</span><b>${totalFat}g</b></div>
+        </div>
+      </div>
+      <div class="cal-bar"><div class="cal-bar-fill" style="width:${Math.min(100, totalCal / goals.calories * 100)}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:4px">目标 ${goals.calories}kcal · 还可吃 ${remainCal}kcal</div>
+      <div style="margin-top:10px"><canvas id="macroDonut" height="150"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🍽️ 按餐次记录</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        ${types.map(t => `<button class="quick-action-btn" data-meal="${t}"><div class="quick-action-icon">${t==='早餐'?'🌅':t==='午餐'?'☀️':t==='晚餐'?'🌙':'🍎'}</div><span>+ ${t}</span></button>`).join('')}
+      </div>
+      ${todayMeals.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🍽️</div><div class="empty-state-text">今天还没吃东西记录～</div></div>' : ''}
       ${todayMeals.map(m => `<div class="meal-card">
-        <div class="meal-icon" style="background:${m.type==='早餐'?'#fef3cd':m.type==='午餐'?'#d4edda':m.type==='晚餐'?'#cce5ff':m.type==='加餐'?'#f8d7da':'#e2d9f3'}">${m.type==='早餐'?'🌅':m.type==='午餐'?'☀️':m.type==='晚餐'?'🌙':m.type==='加餐'?'🍎':'🏃'}</div>
+        <div class="meal-icon" style="background:${m.type==='早餐'?'#fef3cd':m.type==='午餐'?'#d4edda':m.type==='晚餐'?'#cce5ff':'#f8d7da'}">${m.type==='早餐'?'🌅':m.type==='午餐'?'☀️':m.type==='晚餐'?'🌙':'🍎'}</div>
+        ${m.photo ? `<img class="meal-photo" src="${m.photo}" alt="">` : ''}
         <div class="meal-info">
           <div class="meal-name">${escapeHtml(m.name)}${m.grams ? ' · '+m.grams+'g' : ''}</div>
           <div class="meal-time">${m.type} · ${new Date(m.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
@@ -191,13 +318,34 @@ function renderDiet(el) {
       </div>
       <button class="btn btn-primary btn-sm mt-8" id="saveGoalsBtn">保存目标</button>
     </div>
+    <input type="file" id="mealPhotoInput" accept="image/*" capture="environment" style="display:none">
   `;
-  drawCalorieRing(totalCal, goals.calories, remainCal);
-  el.querySelectorAll('.date-picker-item').forEach(d => { d.addEventListener('click', () => { selectedDate = d.dataset.date; HealthPage.render(el.closest('.page-container')); }); });
-  el.querySelectorAll('.quick-action-btn').forEach(btn => { btn.addEventListener('click', () => showAddMealModal(btn.dataset.meal)); });
-  document.getElementById('addWaterBtn').addEventListener('click', () => { const w = Store.get('waterRecords', []); w.push({ id: Store.uid(), amount: 250, date: Store.today(), timestamp: Date.now() }); Store.set('waterRecords', w); HealthPage.render(el.closest('.page-container')); });
-  el.querySelectorAll('.meal-delete').forEach(btn => { btn.addEventListener('click', () => { let m = Store.get('meals', []); m = m.filter(x => x.id !== btn.dataset.id); Store.set('meals', m); HealthPage.render(el.closest('.page-container')); }); });
-  document.getElementById('saveGoalsBtn').addEventListener('click', () => { Store.set('nutritionGoals', { calories: parseInt(document.getElementById('goalCal').value)||2000, carbs: parseInt(document.getElementById('goalCarbs').value)||250, protein: parseInt(document.getElementById('goalProtein').value)||75, fat: parseInt(document.getElementById('goalFat').value)||65 }); });
+  drawMacroDonut(macroKcal, macroSum);
+  el.querySelectorAll('.quick-action-btn').forEach(b => b.addEventListener('click', () => showAddMealModal(b.dataset.meal, null)));
+  el.querySelectorAll('.meal-delete').forEach(b => b.addEventListener('click', () => { let m = Store.get('meals', []); m = m.filter(x => x.id !== b.dataset.id); Store.set('meals', m); renderCalorie(el); }));
+  document.getElementById('saveGoalsBtn').addEventListener('click', () => { Store.set('nutritionGoals', { calories: parseInt(document.getElementById('goalCal').value) || 2000, carbs: parseInt(document.getElementById('goalCarbs').value) || 250, protein: parseInt(document.getElementById('goalProtein').value) || 75, fat: parseInt(document.getElementById('goalFat').value) || 65 }); renderCalorie(el); });
+  const photoBtn = document.getElementById('photoMealBtn');
+  const photoInput = document.getElementById('mealPhotoInput');
+  photoBtn.addEventListener('click', () => photoInput.click());
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files && photoInput.files[0];
+    if (!file) return;
+    compressImage(file, 480, 0.7).then(dataUrl => { showAddMealModal(null, dataUrl); }).catch(() => showAddMealModal(null, null));
+    photoInput.value = '';
+  });
+}
+
+function drawMacroDonut(macroKcal, macroSum) {
+  const canvas = document.getElementById('macroDonut'); if (!canvas) return;
+  if (window.__macroChart) window.__macroChart.destroy();
+  if (typeof Chart === 'undefined') return;
+  const ctx = canvas.getContext('2d');
+  if (macroSum <= 0) { ctx.clearRect(0,0,canvas.width,150); ctx.font='12px sans-serif'; ctx.fillStyle='#9aa5b1'; ctx.textAlign='center'; ctx.fillText('暂无数据', canvas.width/2, 75); return; }
+  window.__macroChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: ['蛋白质', '碳水', '脂肪'], datasets: [{ data: [macroKcal.protein, macroKcal.carbs, macroKcal.fat], backgroundColor: ['#e8746b', '#f1c40f', '#5b9bd5'], borderWidth: 0 }] },
+    options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } }, maintainAspectRatio: false, cutout: '62%' }
+  });
 }
 
 function drawCalorieRing(consumed, goal, remain) {
@@ -209,6 +357,27 @@ function drawCalorieRing(consumed, goal, remain) {
   ctx.beginPath(); ctx.arc(center, center, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress); ctx.strokeStyle = '#7c9cbf'; ctx.lineWidth = lineWidth; ctx.lineCap = 'round'; ctx.stroke();
   ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 18px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(remain, center, center + 2);
   ctx.font = '10px -apple-system, sans-serif'; ctx.fillStyle = '#7f8c9b'; ctx.fillText('剩余kcal', center, center + 16);
+}
+
+// ========== 图片压缩（控制 localStorage 体积） ==========
+function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL('image/jpeg', quality || 0.7));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 const FOOD_DB = {
@@ -223,14 +392,19 @@ function estimateNutrition(foodName, grams) {
   return { calories: Math.round(match.cal * ratio), carbs: Math.round(match.carbs * ratio * 10) / 10, protein: Math.round(match.protein * ratio * 10) / 10, fat: Math.round(match.fat * ratio * 10) / 10 };
 }
 
-function showAddMealModal(mealType) {
+function showAddMealModal(mealType, photo) {
   const modal = document.getElementById('genericModal'); const content = document.getElementById('genericModalContent');
+  const types = ['早餐', '午餐', '晚餐', '加餐'];
+  const typeSel = mealType ? '' : `<div class="form-group"><label class="form-label">餐次</label><div style="display:flex;gap:8px">${types.map(t => `<button type="button" class="meal-type-pick ${t==='加餐'?'active':''}" data-type="${t}">${t}</button>`).join('')}</div></div>`;
   content.innerHTML = `
-    <div class="modal-title">添加${mealType}</div>
+    <div class="modal-title">${photo ? '📷 识别食物' : '添加' + (mealType || '食物')}</div>
+    ${photo ? `<img src="${photo}" style="width:100%;border-radius:10px;margin-bottom:10px;max-height:200px;object-fit:cover">` : ''}
     <div class="form-group"><label class="form-label">食物名称</label><input class="form-input" id="mealName" placeholder="如：鸡胸肉、米饭、鸡蛋"></div>
+    <div style="margin-bottom:8px"><button type="button" class="btn btn-secondary btn-sm" id="foodDbBtn" style="width:100%">🔍 从食物库选择 / 搜索</button><div id="foodDbList" style="display:none;margin-top:6px"></div></div>
     <div class="form-group"><label class="form-label">克重 (g)</label><input class="form-input" type="number" id="mealGrams" placeholder="如：200" value="100"></div>
-    <div id="autoResult" style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:12px;display:none"><div style="font-size:13px;font-weight:600;margin-bottom:6px">🤖 智能估算结果</div><div id="autoNutrition" style="font-size:13px;color:var(--text-secondary)"></div></div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;text-align:center">输入食物名称后点击"计算"自动估算营养</div>
+    ${typeSel}
+    <div id="autoResult" style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:12px;display:none"><div style="font-size:13px;font-weight:600;margin-bottom:6px">🤖 营养估算</div><div id="autoNutrition" style="font-size:13px;color:var(--text-secondary)"></div></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;text-align:center">输入食物名称后点"计算"自动估算（纯静态站无视觉AI，需手动选食物/填数值）</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="form-group"><label class="form-label">热量(kcal)</label><input class="form-input" type="number" id="mealCal" placeholder="自动或手动"></div>
       <div class="form-group"><label class="form-label">碳水(g)</label><input class="form-input" type="number" id="mealCarbs" placeholder="自动或手动"></div>
@@ -240,6 +414,18 @@ function showAddMealModal(mealType) {
     <div class="modal-actions"><button class="btn btn-secondary" id="calcMealBtn" style="flex:0.7">计算</button><button class="btn btn-secondary" id="cancelMealBtn">取消</button><button class="btn btn-primary" id="saveMealBtn">保存</button></div>
   `;
   modal.style.display = 'flex';
+  let pickedType = mealType || '加餐';
+  content.querySelectorAll('.meal-type-pick').forEach(b => b.addEventListener('click', () => { content.querySelectorAll('.meal-type-pick').forEach(x => x.classList.remove('active')); b.classList.add('active'); pickedType = b.dataset.type; }));
+  document.getElementById('foodDbBtn').addEventListener('click', () => {
+    const list = document.getElementById('foodDbList');
+    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    if (list.style.display === 'block' && !list.dataset.filled) {
+      list.dataset.filled = '1';
+      list.innerHTML = `<input class="form-input" id="foodSearch" placeholder="搜索食物，如：鸡" style="margin-bottom:6px"><div id="foodSearchRes" style="max-height:160px;overflow:auto">${Object.keys(FOOD_DB).map(k => `<div class="food-db-item" data-name="${k}">${k} · ${FOOD_DB[k].cal}kcal/100g</div>`).join('')}</div>`;
+      document.getElementById('foodSearch').addEventListener('input', (e) => { const q = e.target.value.trim(); document.getElementById('foodSearchRes').innerHTML = Object.keys(FOOD_DB).filter(k => k.includes(q)).map(k => `<div class="food-db-item" data-name="${k}">${k} · ${FOOD_DB[k].cal}kcal/100g</div>`).join('') || '<div style="font-size:12px;color:var(--text-muted);padding:6px">无结果</div>'; });
+      list.querySelectorAll('.food-db-item').forEach(it => it.addEventListener('click', () => { document.getElementById('mealName').value = it.dataset.name; list.style.display = 'none'; }));
+    }
+  });
   document.getElementById('calcMealBtn').addEventListener('click', () => {
     const name = document.getElementById('mealName').value.trim(); const grams = parseInt(document.getElementById('mealGrams').value) || 100; if (!name) return;
     const result = estimateNutrition(name, grams);
@@ -251,8 +437,8 @@ function showAddMealModal(mealType) {
   document.getElementById('saveMealBtn').addEventListener('click', () => {
     const name = document.getElementById('mealName').value.trim(); if (!name) return;
     const meals = Store.get('meals', []);
-    meals.push({ id: Store.uid(), name, type: mealType, grams: parseInt(document.getElementById('mealGrams').value) || 0, calories: parseInt(document.getElementById('mealCal').value) || 0, carbs: parseFloat(document.getElementById('mealCarbs').value) || 0, protein: parseFloat(document.getElementById('mealProtein').value) || 0, fat: parseFloat(document.getElementById('mealFat').value) || 0, date: selectedDate, timestamp: Date.now() });
-    Store.set('meals', meals); modal.style.display = 'none'; HealthPage.render(document.getElementById('pageContainer'));
+    meals.push({ id: Store.uid(), name, type: pickedType, grams: parseInt(document.getElementById('mealGrams').value) || 0, calories: parseInt(document.getElementById('mealCal').value) || 0, carbs: parseFloat(document.getElementById('mealCarbs').value) || 0, protein: parseFloat(document.getElementById('mealProtein').value) || 0, fat: parseFloat(document.getElementById('mealFat').value) || 0, photo: photo || null, date: selectedDate, timestamp: Date.now() });
+    Store.set('meals', meals); modal.style.display = 'none'; renderCalorie(document.getElementById('dietContent'));
   });
 }
 
@@ -616,27 +802,30 @@ const QI_KB = {
 
 function getDefaultQiDirections() { return ['养胃', '养肝', '养气血', '养目', '养肾', '安神']; }
 
+function weekMonday() {
+  const d = new Date(); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day);
+  return { str: formatDate(d), obj: d };
+}
+
 function renderQi(el, container) {
   const directions = Store.get('qiDirections', getDefaultQiDirections());
   const selected = Store.get('qiSelected', directions.slice());
-  const plans = Store.get('qiPlans', []);
+  const week = weekMonday();
+  const savedWeek = Store.get('qiWeek', null);
+  const weekPlan = (savedWeek && savedWeek.weekStart === week.str) ? savedWeek : null;
   el.innerHTML = `
     <div class="card">
       <div class="card-title">🌿 养生方向</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">点选你想调养的方向（可自由增减），下方一键随机生成对应的具体茶饮 / 食饮 / 健身操 / 穴位按摩 / 泡脚建议。</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">点选你想调养的方向（可自由增减）。本模块按<b>双休上班族</b>节奏，生成一周（周一~周日）养生计划：工作日精简、周末充裕可加料。</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px" id="qiDirWrap">
         ${directions.map(d => `<span class="qi-dir-chip ${selected.includes(d)?'active':''}" data-dir="${escapeHtml(d)}"><span class="qi-dir-text">${escapeHtml(d)}</span>${selected.includes(d)?'<span class="qi-dir-check">✓</span>':''}<button class="qi-dir-del" data-dir="${escapeHtml(d)}" title="删除该方向">×</button></span>`).join('')}
       </div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-secondary btn-sm" id="qiAddDir" style="flex:1">+ 添加方向</button>
-        <button class="btn btn-primary btn-sm" id="qiGen" style="flex:1">🎲 生成今日养生方案</button>
+        <button class="btn btn-primary btn-sm" id="qiGen" style="flex:1">🎲 生成本周7天计划</button>
       </div>
     </div>
-    <div id="qiPlanResult"></div>
-    <div class="card">
-      <div class="card-title">📅 近期养生方案</div>
-      ${plans.length === 0 ? '<div class="empty-state"><div class="empty-state-text">还没有生成方案</div></div>' : plans.slice(0, 8).map(p => `<div class="date-fold"><div class="date-fold-header" onclick="this.parentElement.classList.toggle('open')"><svg class="date-fold-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${formatDateCN(p.date)}<span class="date-fold-count">${p.dirs.join('/')}</span></div><div class="date-fold-body">${qiPlanHtml(p)}</div></div>`).join('')}
-    </div>
+    <div id="qiPlanResult">${weekPlan ? qiWeekHtml(weekPlan, week.str) : '<div class="empty-state"><div class="empty-state-icon">🌿</div><div class="empty-state-text">选择方向后，点「生成本周7天计划」</div></div>'}</div>
   `;
   el.querySelectorAll('.qi-dir-chip').forEach(chip => {
     chip.addEventListener('click', (e) => {
@@ -649,49 +838,67 @@ function renderQi(el, container) {
   el.querySelectorAll('.qi-dir-del').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const d = btn.dataset.dir; let dirs = Store.get('qiDirections', getDefaultQiDirections()); dirs = dirs.filter(x => x !== d); Store.set('qiDirections', dirs); let sel = Store.get('qiSelected', dirs.slice()); sel = sel.filter(x => x !== d); Store.set('qiSelected', sel); renderQi(el, container); }); });
   document.getElementById('qiAddDir').addEventListener('click', () => showTextInputModal('添加养生方向', (name) => { if (!name) return; const dirs = Store.get('qiDirections', getDefaultQiDirections()); if (!dirs.includes(name)) { dirs.push(name); Store.set('qiDirections', dirs); const sel = Store.get('qiSelected', dirs.slice()); sel.push(name); Store.set('qiSelected', sel); } renderQi(el, container); }));
   document.getElementById('qiGen').addEventListener('click', () => {
-    const plan = generateQiPlan(); if (!plan) return;
-    const plans = Store.get('qiPlans', []);
-    const idx = plans.findIndex(p => p.date === plan.date);
-    if (idx >= 0) plans[idx] = plan; else plans.unshift(plan);
-    Store.set('qiPlans', plans);
+    const w = generateQiWeek(); if (!w) return;
+    Store.set('qiWeek', w);
     const area = document.getElementById('qiPlanResult');
-    area.innerHTML = `<div class="card qi-result-card"><div class="card-title">🌿 今日养生方案（${plan.dirs.join(' / ')}）</div>${qiPlanHtml(plan)}<div style="font-size:11px;color:var(--text-muted);margin-top:8px">已保存到「近期养生方案」，仅供参考，不替代医疗诊断。</div></div>`;
+    area.innerHTML = qiWeekHtml(w, week.str);
     area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showToast('已生成本周 7 天养生计划 🌿');
+  });
+  const regen = document.getElementById('qiRegen');
+  if (regen) regen.addEventListener('click', () => {
+    const w = generateQiWeek(); if (!w) return;
+    Store.set('qiWeek', w);
+    document.getElementById('qiPlanResult').innerHTML = qiWeekHtml(w, week.str);
+    showToast('已重新生成本周计划 🌿');
   });
 }
 
-function generateQiPlan() {
+function generateQiWeek() {
   const directions = Store.get('qiDirections', getDefaultQiDirections());
   const selected = Store.get('qiSelected', directions.slice()).filter(d => directions.includes(d));
   if (selected.length === 0) { showToast('请至少选择一个养生方向'); return null; }
   const pick = (arr, n) => { const c = [...arr]; const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(Math.random() * c.length), 1)[0]); return out; };
-  const teas = new Set(), foods = new Set(), exercises = new Set(), acupoints = new Set(); let foot = '';
-  const unknown = [];
-  selected.forEach(d => {
-    const kb = QI_KB[d];
-    if (!kb) { unknown.push(d); return; }
-    pick(kb.teas, 2).forEach(x => teas.add(x));
-    pick(kb.foods, 3).forEach(x => foods.add(x));
-    pick(kb.exercises, 2).forEach(x => exercises.add(x));
-    pick(kb.acupoints, 2).forEach(x => acupoints.add(x));
-    if (!foot) foot = kb.foot;
-  });
-  return {
-    date: Store.today(), dirs: selected,
-    teas: [...teas], foods: [...foods], exercises: [...exercises], acupoints: [...acupoints],
-    foot: foot || '温水泡脚 15-20 分钟', unknown
-  };
+  const week = weekMonday();
+  const names = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(week.obj); dt.setDate(dt.getDate() + i);
+    const isWeekend = i >= 5;
+    const teas = new Set(), foods = new Set(), exercises = new Set(), acupoints = new Set(); let foot = ''; const unknown = [];
+    selected.forEach(d => {
+      const kb = QI_KB[d]; if (!kb) { unknown.push(d); return; }
+      pick(kb.teas, isWeekend ? 2 : 1).forEach(x => teas.add(x));
+      pick(kb.foods, isWeekend ? 3 : 2).forEach(x => foods.add(x));
+      pick(kb.exercises, isWeekend ? 2 : 1).forEach(x => exercises.add(x));
+      pick(kb.acupoints, isWeekend ? 2 : 1).forEach(x => acupoints.add(x));
+      if (!foot) foot = kb.foot;
+    });
+    days.push({
+      label: names[i], date: formatDate(dt), isWeekend,
+      teas: [...teas], foods: [...foods], exercises: [...exercises], acupoints: [...acupoints],
+      foot: foot || '温水泡脚 15-20 分钟', unknown
+    });
+  }
+  return { weekStart: week.str, dirs: selected, days, unknown };
 }
 
-function qiPlanHtml(p) {
-  return `
-    <div class="qi-rec-block"><div class="qi-rec-head">🍵 推荐茶饮</div>${p.teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-    <div class="qi-rec-block"><div class="qi-rec-head">🥗 推荐食饮</div>${p.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-    <div class="qi-rec-block"><div class="qi-rec-head">🤸 推荐健身操</div>${p.exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-    <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位按摩</div>${p.acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-    <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚建议</div><div class="qi-rec-item">${p.foot}</div></div>
-    ${p.unknown && p.unknown.length ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px">自定义方向（${p.unknown.join('、')}）暂无内置资料，建议自行查阅。</div>` : ''}
-  `;
+function qiWeekHtml(w, weekStart) {
+  const today = Store.today();
+  return `<div class="card" style="padding:14px"><div class="card-title">🌿 本周养生计划（${w.dirs.join(' / ')}）</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${formatDateCN(weekStart)} 起 · 工作日精简、周末（${w.dirs.includes('养气血') ? '可加煲汤/艾灸' : '可加料'}）更充裕 · 仅供参考不替代医疗诊断</div>
+    <div class="qi-week">${w.days.map(d => `
+      <div class="qi-day ${d.date === today ? 'today' : ''} ${d.isWeekend ? 'weekend' : ''}">
+        <div class="qi-day-head"><span class="qi-day-name">${d.label}</span><span class="qi-day-date">${d.date.slice(5)}</span>${d.isWeekend ? '<span class="qi-day-tag">周末</span>' : ''}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🍵 茶饮</div>${d.teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🥗 食饮</div>${d.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🤸 健身操</div>${d.exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位</div>${d.acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚</div><div class="qi-rec-item">${d.foot}</div></div>
+      </div>`).join('')}</div>
+    ${w.unknown && w.unknown.length ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">自定义方向（${w.unknown.join('、')}）暂无内置资料，建议自行查阅。</div>` : ''}
+    <button class="btn btn-secondary btn-sm" id="qiRegen" style="width:100%;margin-top:10px">🔄 重新生成本周计划</button>
+  </div>`;
 }
 
 // ========== 模块7: 各种记录（仅"有/无"布尔 + 日期下显示项目 emoji） ==========
