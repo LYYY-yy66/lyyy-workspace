@@ -792,12 +792,123 @@ function renderPlan(area, days, p, container) {
 
 // ========== 模块6: 养出好气血（测评 + 推荐 + 记录） ==========
 const QI_KB = {
-  '养胃': { teas:['山药小米粥','红枣生姜茶','陈皮普洱茶','茯苓白术茶'], foods:['南瓜','山药','小米','莲子','木瓜'], exercises:['饭后散步15分钟','顺时针揉腹36圈','八段锦·调理脾胃须单举'], acupoints:['中脘穴（健胃）','足三里（健脾）','天枢穴（调肠）'], foot:'艾叶生姜水泡脚，温胃散寒，15-20分钟' },
-  '养肝': { teas:['菊花枸杞茶','玫瑰陈皮茶','决明子茶','柴胡疏肝茶'], foods:['菠菜','芹菜','枸杞','胡萝卜','西兰花'], exercises:['八段锦·摇头摆尾去心火','侧腰拉伸','拉伸肝胆经'], acupoints:['太冲穴（疏肝）','期门穴','肝俞穴'], foot:'花椒水泡脚，疏肝理气' },
-  '养气血': { teas:['红枣枸杞茶','桂圆红枣茶','黄芪当归茶','西洋参茶'], foods:['红枣','桂圆','猪肝','瘦肉','黑芝麻','当归炖鸡'], exercises:['八段锦·双手托天理三焦','温和瑜伽','气血操'], acupoints:['足三里（健脾生血）','三阴交（调血）','血海穴（养血）','关元穴（培元）'], foot:'生姜艾叶水泡脚，温补气血，微微出汗' },
-  '养目': { teas:['枸杞菊花茶','决明子茶','桑叶菊花茶'], foods:['胡萝卜','蓝莓','枸杞','猪肝','菠菜'], exercises:['眼保健操','远眺5分钟','转眼球操','热敷眼周'], acupoints:['睛明穴','攒竹穴','太阳穴','风池穴'], foot:'温水泡脚，引血下行缓解眼疲劳' },
-  '养肾': { teas:['黑豆核桃茶','杜仲茶','五味子茶'], foods:['黑豆','黑芝麻','核桃','海参','枸杞'], exercises:['踮脚提踵','搓腰（肾俞）','八段锦·双手攀足固肾腰'], acupoints:['涌泉穴（补肾）','太溪穴','肾俞穴'], foot:'盐水泡脚，温肾助阳' },
-  '安神': { teas:['酸枣仁百合茶','桂圆莲子茶','薰衣草茶'], foods:['莲子','百合','牛奶','核桃','小米'], exercises:['睡前冥想10分钟','腹式呼吸','静坐调息'], acupoints:['神门穴（安神）','三阴交','涌泉穴'], foot:'薰衣草或花椒水泡脚，安神助眠' }
+  '养胃': {
+    teas: [
+      { name:'山药小米粥', recipe:'小米50克 + 鲜山药100克（约一小段）', method:'山药去皮切块，与小米同煮30分钟至软烂，早餐温服' },
+      { name:'红枣生姜茶', recipe:'红枣5颗（去核）+ 生姜3片（约5克）', method:'加水500ml煮15分钟，午后温饮，可连喝3天' },
+      { name:'陈皮普洱茶', recipe:'陈皮3克 + 普洱熟茶5克', method:'沸水冲泡闷5分钟，饭后1小时饮' }
+    ],
+    foods: ['南瓜','山药','小米','莲子','木瓜'],
+    massages: [
+      { point:'中脘穴（肚脐上4寸）', method:'掌心搓热顺时针按揉', seconds:60 },
+      { point:'足三里（膝下3寸）', method:'拇指点按，酸胀为度', seconds:30 },
+      { point:'天枢穴（肚脐旁2寸）', method:'双手食指同时按揉', seconds:30 }
+    ],
+    exercises: [
+      { name:'饭后散步', detail:'饭后慢走助消化', duration:'15分钟' },
+      { name:'顺时针揉腹', detail:'以肚脐为中心手掌顺时针揉', duration:'36圈' },
+      { name:'八段锦·调理脾胃须单举', detail:'左右交替上举拉伸配合呼吸', duration:'8次/组×2' }
+    ],
+    foot: '艾叶10克 + 生姜3片，煮水约45℃泡脚15-20分钟，温胃散寒'
+  },
+  '养肝': {
+    teas: [
+      { name:'菊花枸杞茶', recipe:'白菊5朵 + 枸杞10克', method:'沸水冲泡闷5分钟，清肝明目' },
+      { name:'玫瑰陈皮茶', recipe:'玫瑰花5朵 + 陈皮3克', method:'80℃水冲泡，疏肝理气' },
+      { name:'决明子茶', recipe:'炒决明子10克', method:'沸水冲泡闷10分钟，清肝润肠' }
+    ],
+    foods: ['菠菜','芹菜','枸杞','胡萝卜','西兰花'],
+    massages: [
+      { point:'太冲穴（足背第1-2跖骨间）', method:'拇指由趾向踝方向推按', seconds:30 },
+      { point:'期门穴（乳头直下第6肋间隙）', method:'手掌轻揉', seconds:30 },
+      { point:'肝俞穴（第9胸椎棘突下旁开1.5寸）', method:'握拳按揉', seconds:30 }
+    ],
+    exercises: [
+      { name:'八段锦·摇头摆尾去心火', detail:'马步下蹲摇头摆尾', duration:'8次/组×2' },
+      { name:'侧腰拉伸', detail:'双臂上举向对侧侧弯', duration:'每侧30秒×2' },
+      { name:'拉伸肝胆经', detail:'沿大腿外侧敲打/拉伸', duration:'左右各2分钟' }
+    ],
+    foot: '花椒10克煮水约45℃泡脚15-20分钟，疏肝理气'
+  },
+  '养气血': {
+    teas: [
+      { name:'红枣枸杞茶', recipe:'红枣5颗（去核）+ 枸杞10克 + 桂圆3颗', method:'水600ml煮10分钟，补血安神' },
+      { name:'黄芪当归茶', recipe:'黄芪10克 + 当归3克', method:'水煎20分钟，补气生血' },
+      { name:'桂圆红枣茶', recipe:'桂圆肉8克 + 红枣5颗 + 红糖少许', method:'煮15分钟，温补气血' }
+    ],
+    foods: ['红枣','桂圆','猪肝','瘦肉','黑芝麻','当归炖鸡'],
+    massages: [
+      { point:'足三里（膝下3寸）', method:'拇指点按，健脾生血', seconds:30 },
+      { point:'三阴交（内踝尖上3寸）', method:'拇指按揉，调血', seconds:30 },
+      { point:'血海穴（髌底内侧上2寸）', method:'拇指按揉，养血', seconds:30 },
+      { point:'关元穴（脐下3寸）', method:'掌心搓热顺时针揉，培元', seconds:60 }
+    ],
+    exercises: [
+      { name:'八段锦·双手托天理三焦', detail:'双脚与肩宽，双手上托', duration:'8次/组×2' },
+      { name:'气血操', detail:'原地踏步 + 扩胸', duration:'10分钟' },
+      { name:'温和瑜伽', detail:'猫牛式 + 婴儿式', duration:'15分钟' }
+    ],
+    foot: '生姜10克 + 艾叶10克，煮水42-45℃泡脚15-20分钟，温补气血（微微出汗即可）'
+  },
+  '养目': {
+    teas: [
+      { name:'枸杞菊花茶', recipe:'枸杞10克 + 白菊5朵', method:'沸水闷5分钟，养肝明目' },
+      { name:'决明子茶', recipe:'炒决明子10克', method:'闷10分钟，清肝明目' },
+      { name:'桑叶菊花茶', recipe:'霜桑叶5克 + 白菊5朵', method:'闷8分钟，疏散风热' }
+    ],
+    foods: ['胡萝卜','蓝莓','枸杞','猪肝','菠菜'],
+    massages: [
+      { point:'睛明穴（内眼角稍上方）', method:'食指轻按揉', seconds:20 },
+      { point:'攒竹穴（眉头凹陷）', method:'拇指由内向外推', seconds:20 },
+      { point:'太阳穴（颞部）', method:'拇指画圈按揉', seconds:30 },
+      { point:'风池穴（后颈枕下）', method:'双手拇指按揉', seconds:30 }
+    ],
+    exercises: [
+      { name:'眼保健操', detail:'按揉四白/太阳等穴位', duration:'5分钟' },
+      { name:'远眺', detail:'望6米外景物放松睫状肌', duration:'5分钟' },
+      { name:'转眼球', detail:'上下左右缓慢转动', duration:'各10次' },
+      { name:'热敷眼周', detail:'温毛巾敷眼', duration:'1分钟' }
+    ],
+    foot: '温水42℃泡脚15-20分钟，引血下行缓解眼疲劳'
+  },
+  '养肾': {
+    teas: [
+      { name:'黑豆核桃茶', recipe:'黑豆30克（炒香）+ 核桃仁15克', method:'水煮20分钟，补肾益精' },
+      { name:'杜仲茶', recipe:'杜仲10克', method:'沸水闷10分钟，补肝肾强筋骨' },
+      { name:'五味子茶', recipe:'五味子5克 + 枸杞10克', method:'冲泡，补肾宁心' }
+    ],
+    foods: ['黑豆','黑芝麻','核桃','海参','枸杞'],
+    massages: [
+      { point:'涌泉穴（足底前1/3凹陷）', method:'拇指按揉/搓擦，补肾', seconds:60 },
+      { point:'太溪穴（内踝与跟腱之间）', method:'拇指按揉', seconds:30 },
+      { point:'肾俞穴（第2腰椎棘突下旁开1.5寸）', method:'握拳按揉/搓腰', seconds:60 }
+    ],
+    exercises: [
+      { name:'踮脚提踵', detail:'站立缓慢提踵', duration:'15次/组×3' },
+      { name:'搓腰', detail:'双手搓热擦肾俞穴', duration:'36次' },
+      { name:'八段锦·双手攀足固肾腰', detail:'俯身双手攀足', duration:'8次/组×2' }
+    ],
+    foot: '食盐1小勺溶于温水45℃泡脚15-20分钟，温肾助阳'
+  },
+  '安神': {
+    teas: [
+      { name:'酸枣仁百合茶', recipe:'炒酸枣仁10克 + 百合10克', method:'水煎15分钟，安神助眠' },
+      { name:'桂圆莲子茶', recipe:'桂圆肉8克 + 莲子15克', method:'煮20分钟，养心安神' },
+      { name:'薰衣草茶', recipe:'干薰衣草3克', method:'80℃水冲泡，舒缓神经' }
+    ],
+    foods: ['莲子','百合','牛奶','核桃','小米'],
+    massages: [
+      { point:'神门穴（腕横纹尺侧端）', method:'拇指按揉，安神', seconds:30 },
+      { point:'三阴交（内踝上3寸）', method:'拇指按揉', seconds:30 },
+      { point:'涌泉穴（足底前1/3）', method:'拇指按揉', seconds:60 }
+    ],
+    exercises: [
+      { name:'睡前冥想', detail:'闭目调息，关注呼吸', duration:'10分钟' },
+      { name:'腹式呼吸', detail:'鼻吸鼓腹、嘴呼收腹', duration:'5分钟' },
+      { name:'静坐调息', detail:'盘坐脊柱伸直', duration:'10分钟' }
+    ],
+    foot: '薰衣草3克或花椒10克煮水42℃泡脚15-20分钟，安神助眠'
+  }
 };
 
 function getDefaultQiDirections() { return ['养胃', '养肝', '养气血', '养目', '养肾', '安神']; }
@@ -812,7 +923,8 @@ function renderQi(el, container) {
   const selected = Store.get('qiSelected', directions.slice());
   const week = weekMonday();
   const savedWeek = Store.get('qiWeek', null);
-  const weekPlan = (savedWeek && savedWeek.weekStart === week.str) ? savedWeek : null;
+  const valid = savedWeek && savedWeek.weekStart === week.str && savedWeek.days && savedWeek.days[0] && savedWeek.days[0].massages;
+  const weekPlan = valid ? savedWeek : null;
   el.innerHTML = `
     <div class="card">
       <div class="card-title">🌿 养生方向</div>
@@ -884,18 +996,18 @@ function generateQiWeek() {
   for (let i = 0; i < 7; i++) {
     const dt = new Date(week.obj); dt.setDate(dt.getDate() + i);
     const isWeekend = i >= 5;
-    const teas = new Set(), foods = new Set(), exercises = new Set(), acupoints = new Set(); let foot = ''; const unknown = [];
+    const teas = new Set(), foods = new Set(), massages = new Set(), exercises = new Set(); let foot = ''; const unknown = [];
     selected.forEach(d => {
       const kb = QI_KB[d]; if (!kb) { unknown.push(d); return; }
       pick(kb.teas, isWeekend ? 2 : 1).forEach(x => teas.add(x));
       pick(kb.foods, isWeekend ? 3 : 2).forEach(x => foods.add(x));
+      pick(kb.massages, isWeekend ? 3 : 2).forEach(x => massages.add(x));
       pick(kb.exercises, isWeekend ? 2 : 1).forEach(x => exercises.add(x));
-      pick(kb.acupoints, isWeekend ? 2 : 1).forEach(x => acupoints.add(x));
       if (!foot) foot = kb.foot;
     });
     days.push({
       label: names[i], date: formatDate(dt), isWeekend,
-      teas: [...teas], foods: [...foods], exercises: [...exercises], acupoints: [...acupoints],
+      teas: [...teas], foods: [...foods], massages: [...massages], exercises: [...exercises],
       foot: foot || '温水泡脚 15-20 分钟', unknown
     });
   }
@@ -911,10 +1023,10 @@ function qiWeekHtml(w, weekStart) {
       const isDone = !!done[d.date];
       return `<div class="qi-day ${d.date === today ? 'today' : ''} ${d.isWeekend ? 'weekend' : ''} ${isDone ? 'done' : ''}" data-qdate="${d.date}">
         <div class="qi-day-head"><span class="qi-day-name">${d.label}</span><span class="qi-day-date">${d.date.slice(5)}</span>${d.isWeekend ? '<span class="qi-day-tag">周末</span>' : ''}${isDone ? '<span class="qi-day-check">✓ 已打卡</span>' : ''}</div>
-        <div class="qi-rec-block"><div class="qi-rec-head">🍵 茶饮</div>${d.teas.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-        <div class="qi-rec-block"><div class="qi-rec-head">🥗 食饮</div>${d.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-        <div class="qi-rec-block"><div class="qi-rec-head">🤸 健身操</div>${d.exercises.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
-        <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位</div>${d.acupoints.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🍵 茶饮（对症配方）</div>${d.teas.map(qiTeaHtml).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🥗 食饮建议</div>${d.foods.map(t => `<div class="qi-rec-item">${t}</div>`).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">💆 穴位按摩（按秒数操作）</div>${d.massages.map(qiMassageHtml).join('')}</div>
+        <div class="qi-rec-block"><div class="qi-rec-head">🤸 锻炼（按次数/时长）</div>${d.exercises.map(qiExerciseHtml).join('')}</div>
         <div class="qi-rec-block"><div class="qi-rec-head">🦶 泡脚</div><div class="qi-rec-item">${d.foot}</div></div>
       </div>`;
     }).join('')}</div>
@@ -944,6 +1056,19 @@ function qiStatsHtml(done) {
     <div class="qi-stat-bar"><div class="qi-stat-bar-fill" style="width:${pct}%"></div></div>
     <div style="font-size:11px;color:var(--text-muted);margin-top:6px">本周完成度 ${pct}%</div>
   </div>`;
+}
+
+function qiTeaHtml(t) {
+  if (typeof t === 'string') return `<div class="qi-rec-item">${t}</div>`;
+  return `<div class="qi-rec-item"><b>${t.name}</b><div class="qi-recipe">📋 ${t.recipe}</div><div class="qi-method">🫖 ${t.method}</div></div>`;
+}
+function qiMassageHtml(m) {
+  if (typeof m === 'string') return `<div class="qi-rec-item">${m}</div>`;
+  return `<div class="qi-rec-item"><b>${m.point}</b>：${m.method} <span class="qi-secs">${m.seconds}秒</span></div>`;
+}
+function qiExerciseHtml(e) {
+  if (typeof e === 'string') return `<div class="qi-rec-item">${e}</div>`;
+  return `<div class="qi-rec-item"><b>${e.name}</b>：${e.detail} <span class="qi-secs">${e.duration}</span></div>`;
 }
 
 // ========== 模块7: 各种记录（仅"有/无"布尔 + 日期下显示项目 emoji） ==========

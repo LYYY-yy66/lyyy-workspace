@@ -1110,14 +1110,15 @@ body {
 
 /* ========== Records Calendar Emoji ========== */
 .rec-cal {
-  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
-  margin-top: 12px;
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;
+  margin-top: 12px; width: 100%; max-width: 100%;
 }
 .rec-cal-day {
   aspect-ratio: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: flex-start;
-  padding: 4px 2px; border-radius: var(--radius-sm);
+  padding: 4px 1px; border-radius: var(--radius-sm);
   background: var(--bg); font-size: 12px; position: relative;
+  min-width: 0; overflow: hidden;
   transition: all 0.2s;
 }
 .rec-cal-day.today { border: 2px solid var(--primary); }
@@ -1127,6 +1128,18 @@ body {
 .rec-cal-emojis {
   display: flex; flex-wrap: wrap; gap: 1px; justify-content: center;
   margin-top: 2px; line-height: 1; font-size: 11px;
+}
+/* 养生计划：详细茶饮/按摩/锻炼小字 */
+.qi-recipe { font-size: 11px; color: var(--primary); margin-top: 2px; }
+.qi-method { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.qi-secs { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: var(--success, #7bc4a8); border-radius: 8px; padding: 1px 6px; margin-left: 4px; }
+/* 手机端：收缩打卡日历横向长度，确保周日列可见 */
+@media (max-width: 480px) {
+  .rec-cal { gap: 2px; }
+  .rec-cal-day { padding: 3px 0; font-size: 10px; }
+  .rec-cal-num { font-size: 12px; }
+  .rec-cal-emojis { font-size: 9px; }
+  .month-weekday { font-size: 10px; }
 }
 .record-row { display: flex; align-items: center; gap: 4px; }
 .record-emoji-btn {
